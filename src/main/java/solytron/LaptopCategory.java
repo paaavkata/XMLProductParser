@@ -14,17 +14,13 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import util.PropertiesLoad;
+import util.UrlGenerator;
 
 public class LaptopCategory {
 
 	public static void parseXML() {
 		try {
-			Properties properties = PropertiesLoad.load(
-					new File("C:\\Users\\Pavel Damyanov\\Desktop\\First\\src\\main\\java\\util\\solytron.properties"));
-			URL url = new URL(properties.getProperty("domainname") + properties.getProperty("options.category")
-					+ properties.getProperty("pc.laptop") + "&j_u=" + properties.getProperty("username") + "&j_p="
-					+ properties.getProperty("password"));
-
+			URL url = UrlGenerator.generateSolytronCategory("pc.laptop");
 			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
 			//Document doc = dBuilder.parse(url.openStream());
