@@ -66,7 +66,18 @@ public class Laptop {
 	}
 
 	public void setName(String name) {
-		this.name = name;
+		int spaces = 0;
+		StringBuilder st = new StringBuilder();
+		for(int i = 0; i < name.length(); i++){
+			if(name.charAt(i) == ' '){
+				spaces++;
+				if(spaces == 5){
+					break;
+				}
+			}
+			st.append(name.charAt(i));
+		}
+		this.name = st.toString();
 	}
 
 	public String getVendor() {
@@ -102,7 +113,7 @@ public class Laptop {
 	}
 
 	public String getBattery() {
-		return battery;
+		return battery != null ? battery : "";
 	}
 
 	public void setBattery(String battery) {
@@ -110,7 +121,7 @@ public class Laptop {
 	}
 
 	public String getBatteryFilter() {
-		return batteryFilter;
+		return batteryFilter != null ? batteryFilter : "";
 	}
 
 	public void setBatteryFilter(String batteryFilter) {
@@ -118,7 +129,7 @@ public class Laptop {
 	}
 
 	public String getDimensions() {
-		return dimensions;
+		return dimensions != null ? dimensions : "";
 	}
 
 	public void setDimensions(String dimensions) {
@@ -126,15 +137,17 @@ public class Laptop {
 	}
 
 	public String getWeight() {
-		return weight;
+		return weight != null ? weight : "";
 	}
 
 	public void setWeight(String weight) {
+		
 		this.weight = weight;
+		
 	}
 
 	public String getCpu() {
-		return cpu;
+		return cpu != null ? cpu : "";
 	}
 
 	public void setCpu(String cpu) {
@@ -142,7 +155,7 @@ public class Laptop {
 	}
 
 	public String getCpuFilter() {
-		return cpuFilter;
+		return cpuFilter != null ? cpuFilter : "";
 	}
 
 	public void setCpuFilter(String cpuFilter) {
@@ -150,7 +163,7 @@ public class Laptop {
 	}
 
 	public String getGpu() {
-		return gpu;
+		return gpu != null ? gpu : "";
 	}
 
 	public void setGpu(String gpu) {
@@ -158,23 +171,23 @@ public class Laptop {
 	}
 
 	public String getGpuMemory() {
-		return gpuMemory;
+		return gpuMemory != null ? gpuMemory : "";
 	}
 
 	public void setGpuMemory(String gpuMemory) {
 		this.gpuMemory = gpuMemory;
 	}
 
-	public String getMemory() {
-		return memoryRam;
+	public String getMemoryRam() {
+		return memoryRam != null ? memoryRam : "";
 	}
 
-	public void setMemory(String memory) {
+	public void setMemoryRam(String memory) {
 		this.memoryRam = memory;
 	}
 
-	public String getMemoryType() {
-		return memoryInfo;
+	public String getMemoryInfo() {
+		return memoryInfo != null ? memoryInfo : "";
 	}
 
 	public void setMemoryType(String memoryType) {
@@ -182,7 +195,7 @@ public class Laptop {
 	}
 
 	public String getHdd() {
-		return hdd;
+		return hdd != null ? hdd : "";
 	}
 
 	public void setHdd(String hdd) {
@@ -190,7 +203,7 @@ public class Laptop {
 	}
 
 	public String getHddSize() {
-		return hddSize;
+		return hddSize != null ? hddSize : "";
 	}
 
 	public void setHddSize(String hddSize) {
@@ -198,7 +211,7 @@ public class Laptop {
 	}
 
 	public String getDisplayInfo() {
-		return displayInfo;
+		return displayInfo != null ? displayInfo : "";
 	}
 
 	public void setDisplayInfo(String displayInfo) {
@@ -206,7 +219,7 @@ public class Laptop {
 	}
 
 	public String getDisplaySize() {
-		return displaySize;
+		return displaySize != null ? displaySize : "";
 	}
 
 	public void setDisplaySize(String displaySize) {
@@ -214,7 +227,7 @@ public class Laptop {
 	}
 
 	public String getDisplayResolution() {
-		return displayResolution;
+		return displayResolution != null ? displayResolution : "";
 	}
 
 	public void setDisplayResolution(String displayResolution) {
@@ -222,7 +235,7 @@ public class Laptop {
 	}
 
 	public String getOptical() {
-		return optical;
+		return optical != null ? optical : "";
 	}
 
 	public void setOptical(String optical) {
@@ -230,7 +243,7 @@ public class Laptop {
 	}
 
 	public String getWifi() {
-		return wifi;
+		return wifi != null ? wifi : "";
 	}
 
 	public void setWifi(String wifi) {
@@ -246,7 +259,7 @@ public class Laptop {
 	}
 
 	public String getOtherInfo() {
-		return otherInfo;
+		return otherInfo != null ? otherInfo : "";
 	}
 
 	public void setOtherInfo(String otherInfo) {
@@ -254,7 +267,7 @@ public class Laptop {
 	}
 
 	public String getBrand() {
-		return brand;
+		return brand != null ? brand : "";
 	}
 
 	public void setBrand(String brand) {
@@ -300,7 +313,7 @@ public class Laptop {
 		
 	}
 	public String getAudio() {
-		return audio;
+		return audio != null ? audio : "";
 	}
 
 	public void setConnectivity(String connectivity) {
@@ -308,7 +321,7 @@ public class Laptop {
 	}
 	
 	public String getConnectivity() {
-		return connectivity;
+		return connectivity != null ? connectivity : "";
 	}
 
 	public boolean isWebcam() {
@@ -392,7 +405,7 @@ public class Laptop {
 	}
 
 	public String getOsFilter() {
-		return osFilter;
+		return osFilter != null ? osFilter : "";
 	}
 
 	public void setOsFilter(String osFilter) {
@@ -400,11 +413,12 @@ public class Laptop {
 	}
 
 	public void setChipset(String chipset) {
+		
 		this.chipset = chipset;
 	}
 	
 	public String getChipset() {
-		return chipset;
+		return chipset != null ? chipset : "";
 	}
 
 	public void setColor(String color) {
@@ -412,7 +426,7 @@ public class Laptop {
 	}
 	
 	public String getColor() {
-		return color;
+		return color != null ? color : "";
 	}
 	
 }
