@@ -36,16 +36,6 @@ public class StantekLaptopsBuilder {
 				Laptop laptop = new Laptop();
 				laptop.setPrice(clientPrice);
 				StringBuilder st = new StringBuilder();
-				if(!name.isEmpty()){
-					for(int i = 0; i < name.length(); i++){
-						if(name.charAt(i) == ',' || name.charAt(i) == ';' || name.charAt(i) == '(' ){
-							break;
-						}
-						st.append(name.charAt(i));
-					}
-				}
-				name = st.toString();
-				laptop.setName(name);
 				StringBuilder st1 = new StringBuilder();
 				if(values.containsKey(stantekProperties.getProperty("partitionN"))){
 					laptop.setSku(values.remove(stantekProperties.getProperty("partitionN")));
@@ -53,19 +43,40 @@ public class StantekLaptopsBuilder {
 				if(values.containsKey(stantekProperties.getProperty("partN")) && laptop.getSku() == null){
 					laptop.setSku(values.remove(stantekProperties.getProperty("partN")));
 				}
+				
 				if(laptop.getSku() == null){
-					for(int i = name.length()-1; i >= name.length()-15; i--){
+					for(int i = name.length()-1; i >= name.length()-40; i--){
 						if(name.charAt(i) == ' '){
 							break;
 						}
-						st1.append(name.charAt(i));
+						st.append(name.charAt(i));
 					}
-					String sku = st1.reverse().toString();
-					laptop.setName(name.substring(0,name.length()-sku.length()-1));
-					laptop.setSku(sku);
+					String sku = st.reverse().toString();
+					if(name.length() > 40){
+						name = name.substring(0,name.length()-sku.length()-1);
+					}
+					st = new StringBuilder();
+					for(int i = 0; i < sku.length(); i++){
+						if(sku.charAt(i) == '_'){
+							break;
+						}
+						st.append(sku.charAt(i));
+					}
+					laptop.setSku(st.toString());
 				}
+				st = new StringBuilder();
+				if(!name.isEmpty()){
+					for(int i = 0; i < name.length(); i++){
+						if(name.charAt(i) == ',' || name.charAt(i) == ';' || name.charAt(i) == '(' || name.charAt(i) == (char) 047 ){
+							break;
+						}
+						st.append(name.charAt(i));
+					}
+				}
+				name = st.toString();
+				laptop.setName(name);
 				
-				st.setLength(0);
+				st = new StringBuilder();
 				if(!name.substring(0, 4).equals("Hewl")){
 					for(int i = 0; i <= name.length(); i++){
 						if(name.charAt(i) == ' '){
@@ -87,11 +98,15 @@ public class StantekLaptopsBuilder {
 				}
 				
 				laptop.setQty(5);
-				
-				laptop.setWeight(values.containsKey(stantekProperties.getProperty("weight")) ? 
-						values.remove(stantekProperties.getProperty("weight")) : values.containsKey(stantekProperties.getProperty("weight2")) ?
-							values.remove(stantekProperties.getProperty("weight2")) : "1");
-				
+				if(values.containsKey(values.containsKey(stantekProperties.getProperty("weight")))){
+					laptop.setBattery(values.remove(stantekProperties.getProperty("weight")).substring(1,4));
+				}
+				if(values.containsKey(values.containsKey(stantekProperties.getProperty("weight2"))) && laptop.getBattery() == null){
+					laptop.setBattery(values.remove(stantekProperties.getProperty("weight2")).substring(1,4));
+				}
+				if(laptop.getBattery() == null){
+					laptop.setBattery("2");
+				}
 				String temp = new String();
 				if(values.containsKey(stantekProperties.getProperty("battery"))){
 					temp = values.remove(stantekProperties.getProperty("battery"));
@@ -109,9 +124,6 @@ public class StantekLaptopsBuilder {
 					temp = temp + " " +  values.remove(stantekProperties.getProperty("batteryLife2"));
 				}
 				laptop.setBattery(temp);
-				if(values.containsKey(stantekProperties.getProperty("audio"))){
-					laptop.setAudio(values.remove(stantekProperties.getProperty("batteryLife2")));
-				}
 				
 				if(values.containsKey(stantekProperties.getProperty("audio"))){
 					laptop.setAudio(values.remove(stantekProperties.getProperty("audio")));

@@ -46,8 +46,14 @@ public class Laptop {
 	private boolean rj45;
 	private boolean sensorScreen;
 	private boolean keyboardBacklit;
+	private String warranty;
 	private String chipset;
 	private String color;
+	private String ports;
+	private String weightFilter;
+	private String hddFilter;
+	private String url;
+	
 	
 	public Laptop(){
 		
@@ -68,10 +74,22 @@ public class Laptop {
 	public void setName(String name) {
 		int spaces = 0;
 		StringBuilder st = new StringBuilder();
+		
 		for(int i = 0; i < name.length(); i++){
 			if(name.charAt(i) == ' '){
+				boolean shouldBrake = false;
+				if(spaces > 3){
+					for(int j = i; j < name.length(); j++){
+						if(name.charAt(j) == ' '){
+							break;
+						}
+						if(j > 10){ 
+							shouldBrake = true;
+						}
+					}
+				}
 				spaces++;
-				if(spaces == 5){
+				if(spaces == 5 || shouldBrake){
 					break;
 				}
 			}
@@ -428,5 +446,46 @@ public class Laptop {
 	public String getColor() {
 		return color != null ? color : "";
 	}
+
+	public String getWarranty() {
+		return warranty;
+	}
 	
+	public void setWarranty(String warranty) {
+		this.warranty = warranty;
+	}
+	
+	public String getPorts() {
+		
+		return ports;
+	}
+	
+	public void setPorts(String ports) {
+		this.ports = ports;
+	}
+	
+	public String getWeightFilter() {
+		return weightFilter;
+	}
+
+	public void setWeightFilter(String weightFilter) {
+		this.weightFilter = weightFilter;
+	}
+
+	public String getHddFilter() {
+		return hddFilter;
+	}
+
+	public void setHddFilter(String hddFilter) {
+		this.hddFilter = hddFilter;
+	}
+
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
+	}
+
 }
