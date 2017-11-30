@@ -1,27 +1,34 @@
-package solytron;
+package com.premiummobile.First.solytron;
 
 import java.io.File;
 import java.net.URL;
 import java.util.HashMap;
-import java.util.Properties;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import util.PropertiesLoad;
-import util.UrlGenerator;
+import com.premiummobile.First.util.SolytronUrlGenerator;
+
 
 public class LaptopCategory {
-
-	public static void parseXML() {
+	
+	@Autowired
+	SolytronUrlGenerator urlGenerator;
+	
+	@Autowired
+	DocumentBuilderFactory dbFactory;
+	
+	public void parseXML() {
+				
 		try {
-			URL url = UrlGenerator.generateSolytronCategory("pc.laptop");
-			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+			URL url = urlGenerator.generateSolytronCategory("pc.laptop");
+
 			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
 			//Document doc = dBuilder.parse(url.openStream());
 			Document doc = dBuilder.parse(new File("C:\\Users\\Pavel Damyanov\\Desktop\\First\\src\\main\\java\\solytron\\list.xml"));
@@ -36,7 +43,6 @@ public class LaptopCategory {
 
 				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 					Element eElement = (Element) nNode;
-					
 					String codeId = eElement.getAttribute("codeId");
 					System.out.println(codeId);
 					String productId = buildProductId(eElement.getAttribute("productId"));
