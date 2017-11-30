@@ -10,6 +10,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Set;
 
 import javax.imageio.ImageIO;
@@ -68,7 +69,8 @@ public class StantekCSVMaker {
 			st.append("Лаптопи" + c);
 			st.append("base" + c);
 			st.append("1" + c);
-			st.append(generateAttributes(laptop) + c);
+			st.append(c);
+//			st.append(generateAttributes(laptop) + c);
 			st.append("1" + c);
 			st.append("Taxable goods" + c);
 			st.append("Catalog, Search" + c);
@@ -95,24 +97,37 @@ public class StantekCSVMaker {
 	}
 	
 	private Set<Laptop> checkUniqueUrls(Set<Laptop> laptops) {
-		ArrayList<Laptop> laptopsList = new ArrayList<Laptop>();
-		for(Laptop laptop : laptops){
-			laptopsList.add(laptop);
-		}
-		for(int i = 0; i < laptopsList.size(); i++){
-			if(laptopsList.size()-1 >= i){
-				break;
+		HashMap<String, Laptop> mappedLaptops = new HashMap<String, Laptop>();
+		int count = 1;
+		for(Laptop laptop : laptops) {
+			if(!mappedLaptops.containsKey(laptop.getUrl())) {
+				mappedLaptops.put(laptop.getUrl(), laptop);
 			}
-			int counter = 1;
-			for(int j = i+1; i < laptopsList.size()-1; j++){
-				if(laptopsList.get(i).getUrl().equals(laptopsList.get(j).getUrl())){
-					laptopsList.get(j).setUrl(laptopsList.get(j).getUrl() + counter);
-					counter++;
-				}
+			else{
+				laptop.setUrl(laptop.getUrl() + count);
+				mappedLaptops.put(laptop.getUrl(), laptop);
+				count++;
 			}
+			System.out.println(laptop.getUrl());
 		}
-		laptops.clear();
-		laptops.addAll(laptopsList);
+//		ArrayList<Laptop> laptopsList = new ArrayList<Laptop>();
+//		for(Laptop laptop : laptops){
+//			laptopsList.add(laptop);
+//		}
+//		for(int i = 0; i <= laptopsList.size()-1; i++){
+//			int counter = 1;
+//			if(i >= laptopsList.size()-2) {
+//				break;
+//			}
+//			for(int j = i+1; i < laptopsList.size()-1; j++){
+//				if(laptopsList.get(i).getUrl().equals(laptopsList.get(j).getUrl())){
+//					laptopsList.get(j).setUrl(laptopsList.get(j).getUrl() + String.valueOf(counter));
+//					counter++;
+//				}
+//			}
+//		}
+//		laptops.clear();
+//		laptops.addAll(laptopsList);
 		return laptops;
 	}
 

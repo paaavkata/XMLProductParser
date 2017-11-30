@@ -75,8 +75,40 @@ public class StantekLaptopsBuilder {
 				}
 				name = st.toString();
 				name = name.replaceAll("&quot", "");
-				laptop.setName(name);
-				laptop.setUrl(laptop.getName().replaceAll(" ", "-").replaceAll("\\", "-").replaceAll("/", "-") + "-top-cena-na-izplashtane");
+				int spaces = 0;
+				st = new StringBuilder();
+				for(int i = 0; i < name.length(); i++){
+					if(name.charAt(i) == ' '){
+						boolean shouldBrake = false;
+						if(spaces > 3){
+							for(int j = i; j < name.length(); j++){
+								if(name.charAt(j) == ' '){
+									break;
+								}
+								if(j > 10){ 
+									shouldBrake = true;
+								}
+							}
+						}
+						spaces++;
+						if(spaces == 5 || shouldBrake){
+							break;
+						}
+					}
+					st.append(name.charAt(i));
+				}
+				String newName = st.toString();
+				laptop.setName(newName);
+				StringBuilder st2 = new StringBuilder();
+				for(int i = 0; i < newName.length(); i++) {
+					if(newName.charAt(i) == ' ' || newName.charAt(i) == (char) 92 || newName.charAt(i) == (char) 47) {
+						st2.append("-");
+						continue;
+					}
+					st2.append(newName.charAt(i));
+				}
+				st2.append("-top-cena-na-izplashtane");
+				laptop.setUrl(st2.toString());
 				st = new StringBuilder();
 				if(!name.substring(0, 4).equals("Hewl")){
 					for(int i = 0; i <= name.length(); i++){
@@ -270,7 +302,7 @@ public class StantekLaptopsBuilder {
 				temp = values.remove(stantekProperties.getProperty("hddGB"));
 				
 				if(temp != null){
-					StringBuilder st2 = new StringBuilder();
+					st2 = new StringBuilder();
 					for(int i = 0; i < temp.length(); i ++ ){
 						if(temp.charAt(i) == 'G'){
 							break;
@@ -284,7 +316,7 @@ public class StantekLaptopsBuilder {
 				if(laptop.getHddSize() == null){
 					temp = values.remove(stantekProperties.getProperty("hddSize"));
 					if(temp != null){
-						StringBuilder st2 = new StringBuilder();
+						st2 = new StringBuilder();
 						for(int i = 0; i < temp.length(); i ++ ){
 							if(temp.charAt(i) == 'G'){
 								break;

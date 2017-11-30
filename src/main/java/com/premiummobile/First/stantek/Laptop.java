@@ -72,30 +72,7 @@ public class Laptop {
 	}
 
 	public void setName(String name) {
-		int spaces = 0;
-		StringBuilder st = new StringBuilder();
-		
-		for(int i = 0; i < name.length(); i++){
-			if(name.charAt(i) == ' '){
-				boolean shouldBrake = false;
-				if(spaces > 3){
-					for(int j = i; j < name.length(); j++){
-						if(name.charAt(j) == ' '){
-							break;
-						}
-						if(j > 10){ 
-							shouldBrake = true;
-						}
-					}
-				}
-				spaces++;
-				if(spaces == 5 || shouldBrake){
-					break;
-				}
-			}
-			st.append(name.charAt(i));
-		}
-		this.name = st.toString();
+		this.name = name;
 	}
 
 	public String getVendor() {
