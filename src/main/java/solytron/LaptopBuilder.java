@@ -31,22 +31,24 @@ public class LaptopBuilder {
 			for (int temp = 0; temp < nList.getLength(); temp++) {
 				Node nNode = nList.item(temp);
 				System.out.println("\nCurrent Element :" + nNode.getNodeName());
-				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
-					Element element = (Element) nNode;
-					String smthn;
-					String codeId = element.getAttribute("codeId");
-					String name = element.getElementsByTagName("name").item(0).getTextContent();
-					String vendor = element.getElementsByTagName("vendor").item(0).getTextContent();
-					double price = element.getElementsByTagName("price").toString() != ""
-							? Double.parseDouble(element.getElementsByTagName("price").item(0).getTextContent()) : 0;
-					double userPrice = element.getElementsByTagName("priceEndUser").toString() != ""
-							? Double.parseDouble(element.getElementsByTagName("priceEndUser").item(0).getTextContent())
-							: 0;
-					String stockInfoValue = (element.getAttribute("stockInfoValue") != ""
-							? element.getAttribute("stockInfoValue") : null);
-					int stockInfoData = element.getAttribute("stockInfoData").toString() != ""
-							? Integer.parseInt(element.getAttribute("stockInfoData").toString()) : 0;
-				}
+//				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+//					for(int temp2 = 0; temp2 <)
+//					Element element = (Element) nNode;
+//					System.out.println(element.getElementsByTagName("property").item(0).getTextContent());
+//					String smthn;
+//					String codeId = element.getAttribute("codeId");
+//					String name = element.getElementsByTagName("name").item(0).getTextContent();
+//					String vendor = element.getElementsByTagName("vendor").item(0).getTextContent();
+//					double price = element.getElementsByTagName("price").toString() != ""
+//							? Double.parseDouble(element.getElementsByTagName("price").item(0).getTextContent()) : 0;
+//					double userPrice = element.getElementsByTagName("priceEndUser").toString() != ""
+//							? Double.parseDouble(element.getElementsByTagName("priceEndUser").item(0).getTextContent())
+//							: 0;
+//					String stockInfoValue = (element.getAttribute("stockInfoValue") != ""
+//							? element.getAttribute("stockInfoValue") : null);
+//					int stockInfoData = element.getAttribute("stockInfoData").toString() != ""
+//							? Integer.parseInt(element.getAttribute("stockInfoData").toString()) : 0;
+//				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
