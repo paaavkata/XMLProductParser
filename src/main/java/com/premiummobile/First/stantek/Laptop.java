@@ -169,7 +169,7 @@ public class Laptop {
 	}
 
 	public void setCpu(String cpu) {
-		this.cpu = cpu;
+		this.cpu = cpu.trim();
 	}
 
 	public String getCpuFilter() {
@@ -177,7 +177,19 @@ public class Laptop {
 	}
 
 	public void setCpuFilter(String cpuFilter) {
-		this.cpuFilter = cpuFilter;
+		cpuFilter = cpuFilter.trim();
+		StringBuilder st = new StringBuilder();
+		int spaces = 0;
+		for(int i = 0; i < cpuFilter.length(); i++) {
+			if(cpuFilter.charAt(i) == ' ') {
+				spaces++;
+				if(spaces >= 3) {
+					break;
+				}
+			}
+			st.append(cpuFilter.charAt(i));
+		}
+		this.cpuFilter = st.toString();
 	}
 
 	public String getGpu() {
@@ -201,7 +213,22 @@ public class Laptop {
 	}
 
 	public void setMemoryRam(String memory) {
-		this.memoryRam = memory;
+		if(memory != null && !memory.equals(""))
+		memory = memory.trim();
+		StringBuilder st = new StringBuilder();
+		for(int i = 0; i < memory.length(); i++) {
+			if(memory.charAt(i) > 57 || memory.charAt(i) < 49) {
+				break;
+			}
+			st.append(memory.charAt(i));
+		}
+		if(st.length() >= 3) {
+			int memoryInt = Integer.parseInt(st.toString());
+			this.memoryRam = String.valueOf(memoryInt/1024) + "GB";
+		}
+		else {
+			this.memoryRam = st.toString() + "GB";
+		}
 	}
 
 	public String getMemoryInfo() {

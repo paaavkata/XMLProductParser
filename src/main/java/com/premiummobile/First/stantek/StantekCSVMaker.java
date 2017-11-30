@@ -1,5 +1,6 @@
 package com.premiummobile.First.stantek;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -11,14 +12,16 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Set;
 
+import javax.imageio.ImageIO;
+
 import org.springframework.stereotype.Component;
 
 @Component
 public class StantekCSVMaker {
 	
 	public String makeLaptopCSV(Set<Laptop> laptops){
-		laptops = downloadImages(laptops);
-		laptops = generateUrls(laptops);
+		//laptops = downloadImages(laptops);
+		laptops = checkUniqueUrls(laptops);
 		PrintWriter pw = null;
 		try {
 		    pw = new PrintWriter(new File("Laptops.csv"));
@@ -45,7 +48,6 @@ public class StantekCSVMaker {
 				+ "short_description" + c
 				+ "url_key" + c
 				+ "meta_title" + c
-//				+ "meta_keywords" + c
 				+ "meta_description" + c
 				+ "weight" + c
 				
@@ -62,66 +64,50 @@ public class StantekCSVMaker {
 			st.append(laptop.getSku().trim() + c);
 			st.append(laptop.getName() + c);
 			st.append(String.valueOf(laptop.getPrice()) + c);
-//			st.append(c);
 			st.append("simple" + c);
 			st.append("Лаптопи" + c);
 			st.append("base" + c);
 			st.append("1" + c);
-			//st.append("probni atributi" + c);
 			st.append(generateAttributes(laptop) + c);
 			st.append("1" + c);
 			st.append("Taxable goods" + c);
 			st.append("Catalog, Search" + c);
 			st.append("1" + c);
-			
 			st.append("Главна директория,Главна директория/Лаптопи,Главна директория/Лаптопи/" + laptop.getBrand() + c);
-			//TO-DO short description generator
-			st.append(generateShortDescription(laptop) + c);
+			st.append(checkForCommas(generateShortDescription(laptop)) + c);
 			st.append(laptop.getUrl() + c);
 			st.append(laptop.getName() + " на топ цена и на изплащане от Примиъм Мобайл ЕООД :: ревюта, характеристики, снимки" + c);
 			st.append("Можете да вземете " + laptop.getName() + " още днес на топ цена и на изплащане "
 					+ "с минимално оскъпяване и светкавично одобрение от PremiumMobile.bg. "
 					+ "Бърза доставка на следващия ден и любезно обслужване." + c);
 			st.append(laptop.getWeight() + c);
-			
-			st.append(laptop.getName() + " топ цена на изплащане"+ c);
 			st.append(laptop.getImages().get(0) + c);
 			st.append(laptop.getName() + " топ цена на изплащане"+ c);
 			st.append(laptop.getImages().get(0) + c);
-			
+			st.append(laptop.getName() + " топ цена на изплащане"+ c);
 			st.append(laptop.getImages().get(0) + c);
 			st.append(laptop.getName() + " топ цена на изплащане");
 			st.append((char) 012);
-			
 		}
-		
 		pw.write(st.toString());
 		pw.close();
 		return "response";
 	}
 	
-	private Set<Laptop> generateUrls(Set<Laptop> laptops) {
+	private Set<Laptop> checkUniqueUrls(Set<Laptop> laptops) {
 		ArrayList<Laptop> laptopsList = new ArrayList<Laptop>();
 		for(Laptop laptop : laptops){
 			laptopsList.add(laptop);
 		}
 		for(int i = 0; i < laptopsList.size(); i++){
-			String name = laptopsList.get(i).getName();
-			if(laptopsList.get(i).getUrl() != null){
-				continue;
-			}
 			if(laptopsList.size()-1 >= i){
 				break;
 			}
+			int counter = 1;
 			for(int j = i+1; i < laptopsList.size()-1; j++){
-				if(laptopsList.get(j).getUrl() != null){
-					continue;
-				}
-				if(laptopsList.get(j).getName().equals(name)){
-					laptopsList.get(j).setUrl(name + String.valueOf(j) + "-top-cena-na-izplashtane");
-				}
-				else{
-					laptopsList.get(j).setUrl(name + "-top-cena-na-izplashtane");
+				if(laptopsList.get(i).getUrl().equals(laptopsList.get(j).getUrl())){
+					laptopsList.get(j).setUrl(laptopsList.get(j).getUrl() + counter);
+					counter++;
 				}
 			}
 		}
@@ -131,51 +117,76 @@ public class StantekCSVMaker {
 	}
 
 	private Set<Laptop> downloadImages(Set<Laptop> laptops) {
+		int imageCounter = 1;
 		for (Laptop laptop : laptops){
 			if(laptop.getImages().size() > 1){
-				int count = 1;
-				ArrayList<String> images= new ArrayList<String>();
-				for(String imageString : laptop.getImages()){
-					String path = "/images/" + laptop.getSku() + String.valueOf(count) + ".jpg";
-					try(InputStream in = new URL(imageString).openStream()){
-					    Files.copy(in, Paths.get(path));
-					    images.add(path);
-					}
-					catch(IOException e){
-						System.out.println("Error while trying to download image for " + laptop.getSku());
-					}
-					count++;
-				}
-				laptop.setImages(images);
+//				int count = 1;
+//				ArrayList<String> images = new ArrayList<String>();
+//				for(String imageString : laptop.getImages()){
+//					String path = "c:\\images\\" + laptop.getSku() + String.valueOf(count) + ".jpg";
+//					try{
+//						URL url = new URL(imageString);
+//				        BufferedImage img = ImageIO.read(url);
+//				        File file = new File("c:\\images\\" + laptop.getSku() + ".jpg");
+//				        ImageIO.write(img, "jpg", file);
+//					    images.add(path);
+//					}
+//					catch(IOException e){
+//						e.printStackTrace();
+//					}
+//					count++;
+//				}
+//				count = 1;
+//				laptop.setImages(images);
 			}
 			else{
-				try(InputStream in = new URL(laptop.getImages().get(0)).openStream()){
-				    Files.copy(in, Paths.get("/images/" + laptop.getSku() + ".jpg"));
-				    ArrayList<String> images= new ArrayList<String>();
-				    images.add("images/" + laptop.getSku() + ".jpg");
-				    laptop.setImages(images);
+				ArrayList<String> images= new ArrayList<String>();
+				String imageName = "image" + imageCounter + ".jpg";
+				try {
+				URL url = new URL(laptop.getImages().get(0));
+		        BufferedImage img = ImageIO.read(url);
+		        
+		        File file = new File("c:\\images\\" + imageName);
+		        if(img == null || file == null) {
+		        	continue;
+		        }
+		        ImageIO.write(img, "jpg", file);
+		        
+			    images.add(imageName);
+			    laptop.setImages(images);
 				}
 				catch(IOException e){
-					System.out.println("Error while trying to download image for " + laptop.getSku());
+					System.out.println(e.getMessage());
+					images.add(imageName);
+				    laptop.setImages(images);
 				}
 			}
+			imageCounter++;
 		}
 		return laptops;
 	}
 
 	private String generateShortDescription(Laptop laptop){
+//		<ul class="short-description-list smartphone">
+//		<div class="row">
+//		<div class="col-md-2 col-md-offset-1"><li class="display-size">4.7'' </li></div>
+//		<div class="col-md-2"><li class="processor">8-ядрен</li></div>
+//		<div class="col-md-2"><li class="memory">2 GB</li></div>
+//		<div class="col-md-2"><li class="hdd">16 GB</li></div>
+//		<div class="col-md-2"><li class="battery">2000 mAh</li></div></div>
+//		</ul>
 		StringBuilder st = new StringBuilder();
-		st.append("<tags>");
-		st.append(laptop.getCpu());
-		st.append("<tags>");
+		st.append("<ul class=\"short-description-list smartphone\"><div class=\"row\"><div class=\"col-md-2 col-md-offset-1\"><li class=\"display-size\">");
+		st.append(laptop.getDisplaySize());
+		st.append("</li></div><div class=\"col-md-2\"><li class=\"processor\">");
+		st.append(laptop.getCpuFilter());
+		st.append("</li></div><div class=\"col-md-2\"><li class=\"memory\">");
 		st.append(laptop.getMemoryRam());
-		st.append("<tags>");
-		st.append(laptop.getHdd());
-		st.append("<tags>");
-		st.append(laptop.getGpuMemory());
-		st.append("<tags>");
+		st.append("</li></div><div class=\"col-md-2\"><li class=\"hdd\">");
+		st.append(laptop.getHddSize());
+		st.append("</li></div><div class=\"col-md-2\"><li class=\"battery\">");
 		st.append(laptop.getBattery());
-		st.append("<tags>");
+		st.append("</li></div></div></ul>");
 		return st.toString();
 	}
 	
@@ -189,7 +200,7 @@ public class StantekCSVMaker {
 		st.append("laptop_dimensions=" + checkForCommas(laptop.getDimensions())+ c);
 		st.append("laptop_display_info=" + checkForCommas(laptop.getDisplayInfo())+ c);
 		st.append("laptop_display_resolution=" + checkForCommas(laptop.getDisplayResolution())+ c);
-		st.append("laptop_display_size=" + checkForCommas(laptop.getDisplaySize()) + c);
+		st.append("laptop_display_size=" + checkForCommas(laptop.getDisplaySize().replaceAll("&quot", "").replaceAll("&apos", "")) + c);
 		st.append("laptop_gpu=" + checkForCommas(laptop.getGpu())+ c);
 		st.append("laptop_gpu_memory=" + checkForCommas(laptop.getGpuMemory())+ c);
 		st.append("laptop_hdd_info=" + checkForCommas(laptop.getHdd())+ c);
@@ -222,7 +233,7 @@ public class StantekCSVMaker {
 			}
 			st.append(text.charAt(i));
 		}
-		return st.toString();
+		return st.toString().trim();
 	}
 
 	private String generateYesNoFilter(Laptop laptop){
