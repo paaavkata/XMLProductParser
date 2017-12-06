@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
 public class StantekCSVMaker {
 	
 	public String makeLaptopCSV(Set<Laptop> laptops){
-		//laptops = downloadImages(laptops);
+		laptops = downloadImages(laptops);
 		laptops = checkUniqueUrls(laptops);
 		PrintWriter pw = null;
 		try {
@@ -32,13 +32,14 @@ public class StantekCSVMaker {
 		char c = ';';
 		StringBuilder st = new StringBuilder();
 		String firstRow = "sku" + c
+				+ "store_view_code" + c
 				+ "name" + c
 				+ "price" + c
 				+ "product_type" + c
 				+ "attribute_set_code" + c
 				+ "product_websites" + c
 				+ "qty" + c
-				+ "additional_attributes" + c
+//				+ "additional_attributes" + c
 				
 				+ "product_online" + c
 				+ "tax_class_name" + c
@@ -57,19 +58,46 @@ public class StantekCSVMaker {
 				+ "small_image" + c
 				+ "small_image_label" + c
 				+ "thumbnail_image" + c
-				+ "thumbnail_image_label";
-				
-		st.append(firstRow + "\n");
+				+ "thumbnail_image_label" + c;
+		st.append(firstRow);		
+//		st.append(firstRow + "\n");
+		
+		
+		st.append("hdd_razmer_filt_r_laptop" + c);
+		st.append("laptop_battery" + c);
+		st.append("laptop_cpu_filter" + c);
+		st.append("laptop_color" + c);
+		st.append("laptop_dimensions" + c);
+		st.append("laptop_display_info" + c);
+		st.append("laptop_display_resolution" + c);
+		st.append("laptop_display_size" + c);
+		st.append("laptop_gpu" + c);
+		st.append("laptop_gpu_memory" + c);
+		st.append("laptop_hdd_size" + c);
+		st.append("laptop_optical" + c);
+		st.append("laptop_os_filter" + c);
+		st.append("laptop_other_info" + c);
+		st.append("laptop_ports" + c);
+		st.append("laptop_processor" + c);
+		st.append("laptop_ram" + c);
+		st.append("laptop_ram_info" + c);
+		st.append("laptop_sound" + c);
+		st.append("laptop_warranty" + c);
+		st.append("laptop_weight" + c);
+		st.append("laptop_wifi" + c);
+		st.append("gsm_manufacturer" + c);
+		st.append("laptop_yes_no");
+		st.append("\n");
+		
 		
 		for(Laptop laptop : laptops){
-			st.append(laptop.getSku().trim() + c);
+			st.append(laptop.getSku().trim() + c + c);
 			st.append(laptop.getName() + c);
 			st.append(String.valueOf(laptop.getPrice()) + c);
 			st.append("simple" + c);
 			st.append("Лаптопи" + c);
 			st.append("base" + c);
-			st.append("1" + c);
-			st.append(c);
+			st.append("1" + c);	
 //			st.append(generateAttributes(laptop) + c);
 			st.append("1" + c);
 			st.append("Taxable goods" + c);
@@ -88,7 +116,33 @@ public class StantekCSVMaker {
 			st.append(laptop.getImages().get(0) + c);
 			st.append(laptop.getName() + " топ цена на изплащане"+ c);
 			st.append(laptop.getImages().get(0) + c);
-			st.append(laptop.getName() + " топ цена на изплащане");
+			st.append(laptop.getName() + " топ цена на изплащане" + c);
+			//23
+			st.append(checkForCommas(laptop.getHddFilter()) + c);
+			st.append(checkForCommas(laptop.getBattery()) + c);
+			st.append(checkForCommas(laptop.getCpuFilter())+ c);
+			st.append(checkForCommas(laptop.getColor()) + c);
+			st.append(checkForCommas(laptop.getDimensions())+ c);
+			st.append(checkForCommas(laptop.getDisplayInfo())+ c);
+			st.append(checkForCommas(laptop.getDisplayResolution())+ c);
+			st.append(checkForCommas(laptop.getDisplaySize()) + c);
+			st.append(checkForCommas(laptop.getGpu())+ c);
+			st.append(checkForCommas(laptop.getGpuMemory())+ c);
+			st.append(checkForCommas(laptop.getHddSize()) + c);
+			st.append(checkForCommas(laptop.getOptical()) + c);
+			st.append(checkForCommas(laptop.getOsFilter()) + c);
+			st.append(checkForCommas(laptop.getOtherInfo()) + c);
+			st.append(checkForCommas(laptop.getPorts()) + c);
+			st.append(checkForCommas(laptop.getCpu()) + c);
+			st.append(checkForCommas(laptop.getMemoryRam()) + c);
+			st.append(checkForCommas(laptop.getMemoryInfo()) + c);
+			st.append(checkForCommas(laptop.getAudio()) + c);
+			st.append(checkForCommas(laptop.getWarranty()) + c);
+			st.append(checkForCommas(laptop.getWeight()) + c);
+			st.append(checkForCommas(laptop.getWifi()) + c);
+			st.append(laptop.getBrand() + c);
+			st.append(generateYesNoFilter(laptop));
+			
 			st.append((char) 012);
 		}
 		pw.write(st.toString());
@@ -96,45 +150,26 @@ public class StantekCSVMaker {
 		return "response";
 	}
 	
-	private Set<Laptop> checkUniqueUrls(Set<Laptop> laptops) {
-		HashMap<String, Laptop> mappedLaptops = new HashMap<String, Laptop>();
+	private Set checkUniqueUrls(Set<Laptop> products) {
+		HashMap<String, LocalProduct> mappedProducts = new HashMap<String, LocalProduct>();
 		int count = 1;
-		for(Laptop laptop : laptops) {
-			if(!mappedLaptops.containsKey(laptop.getUrl())) {
-				mappedLaptops.put(laptop.getUrl(), laptop);
+		for(LocalProduct product : products) {
+			if(!mappedProducts.containsKey(product.getUrl())) {
+				mappedProducts.put(product.getUrl(), product);
 			}
 			else{
-				laptop.setUrl(laptop.getUrl() + count);
-				mappedLaptops.put(laptop.getUrl(), laptop);
+				product.setUrl(product.getUrl() + count);
+				mappedProducts.put(product.getUrl(), product);
 				count++;
 			}
-			System.out.println(laptop.getUrl());
 		}
-//		ArrayList<Laptop> laptopsList = new ArrayList<Laptop>();
-//		for(Laptop laptop : laptops){
-//			laptopsList.add(laptop);
-//		}
-//		for(int i = 0; i <= laptopsList.size()-1; i++){
-//			int counter = 1;
-//			if(i >= laptopsList.size()-2) {
-//				break;
-//			}
-//			for(int j = i+1; i < laptopsList.size()-1; j++){
-//				if(laptopsList.get(i).getUrl().equals(laptopsList.get(j).getUrl())){
-//					laptopsList.get(j).setUrl(laptopsList.get(j).getUrl() + String.valueOf(counter));
-//					counter++;
-//				}
-//			}
-//		}
-//		laptops.clear();
-//		laptops.addAll(laptopsList);
-		return laptops;
+		return products;
 	}
 
-	private Set<Laptop> downloadImages(Set<Laptop> laptops) {
+	private Set downloadImages(Set<Laptop> products) {
 		int imageCounter = 1;
-		for (Laptop laptop : laptops){
-			if(laptop.getImages().size() > 1){
+		for (LocalProduct product : products){
+			if(product.getImages().size() > 1){
 //				int count = 1;
 //				ArrayList<String> images = new ArrayList<String>();
 //				for(String imageString : laptop.getImages()){
@@ -158,9 +193,8 @@ public class StantekCSVMaker {
 				ArrayList<String> images= new ArrayList<String>();
 				String imageName = "image" + imageCounter + ".jpg";
 				try {
-				URL url = new URL(laptop.getImages().get(0));
+				URL url = new URL(product.getImages().get(0));
 		        BufferedImage img = ImageIO.read(url);
-		        
 		        File file = new File("c:\\images\\" + imageName);
 		        if(img == null || file == null) {
 		        	continue;
@@ -168,31 +202,23 @@ public class StantekCSVMaker {
 		        ImageIO.write(img, "jpg", file);
 		        
 			    images.add(imageName);
-			    laptop.setImages(images);
+			    product.setImages(images);
 				}
 				catch(IOException e){
 					System.out.println(e.getMessage());
 					images.add(imageName);
-				    laptop.setImages(images);
+					product.setImages(images);
 				}
 			}
 			imageCounter++;
 		}
-		return laptops;
+		return products;
 	}
 
 	private String generateShortDescription(Laptop laptop){
-//		<ul class="short-description-list smartphone">
-//		<div class="row">
-//		<div class="col-md-2 col-md-offset-1"><li class="display-size">4.7'' </li></div>
-//		<div class="col-md-2"><li class="processor">8-ядрен</li></div>
-//		<div class="col-md-2"><li class="memory">2 GB</li></div>
-//		<div class="col-md-2"><li class="hdd">16 GB</li></div>
-//		<div class="col-md-2"><li class="battery">2000 mAh</li></div></div>
-//		</ul>
 		StringBuilder st = new StringBuilder();
 		st.append("<ul class=\"short-description-list smartphone\"><div class=\"row\"><div class=\"col-md-2 col-md-offset-1\"><li class=\"display-size\">");
-		st.append(laptop.getDisplaySize());
+		st.append(laptop.getDisplaySize().replaceAll("$quot", "").replaceAll("$apos", ""));
 		st.append("</li></div><div class=\"col-md-2\"><li class=\"processor\">");
 		st.append(laptop.getCpuFilter());
 		st.append("</li></div><div class=\"col-md-2\"><li class=\"memory\">");
@@ -200,25 +226,36 @@ public class StantekCSVMaker {
 		st.append("</li></div><div class=\"col-md-2\"><li class=\"hdd\">");
 		st.append(laptop.getHddSize());
 		st.append("</li></div><div class=\"col-md-2\"><li class=\"battery\">");
-		st.append(laptop.getBattery());
+		StringBuilder st2 = new StringBuilder();
+		String battery = laptop.getBattery();
+		int spaces = 0;
+		for(int i = 0; i < battery.length(); i++){
+			if(battery.charAt(i) == ' '){
+				spaces++;
+			}
+			if(spaces == 3){
+				break;
+			}
+			st2.append(battery.charAt(i));
+		}
+		st.append(st2.toString());
 		st.append("</li></div></div></ul>");
 		return st.toString();
 	}
 	
 	private String generateAttributes(Laptop laptop){
 		StringBuilder st = new StringBuilder();
-		char c = ',';
+		char c = ';';
 		st.append("hdd_razmer_filt_r_laptop=" + checkForCommas(laptop.getHddFilter()) + c);
 		st.append("laptop_battery=" + checkForCommas(laptop.getBattery()) + c);
-		st.append("laptop_battery_filter=" + checkForCommas(laptop.getBatteryFilter()) + c);
 		st.append("laptop_cpu_filter=" + checkForCommas(laptop.getCpuFilter())+ c);
+		st.append("laptop_color=" + checkForCommas(laptop.getColor()) + c);
 		st.append("laptop_dimensions=" + checkForCommas(laptop.getDimensions())+ c);
 		st.append("laptop_display_info=" + checkForCommas(laptop.getDisplayInfo())+ c);
 		st.append("laptop_display_resolution=" + checkForCommas(laptop.getDisplayResolution())+ c);
-		st.append("laptop_display_size=" + checkForCommas(laptop.getDisplaySize().replaceAll("&quot", "").replaceAll("&apos", "")) + c);
+		st.append("laptop_display_size=" + checkForCommas(laptop.getDisplaySize()) + c);
 		st.append("laptop_gpu=" + checkForCommas(laptop.getGpu())+ c);
 		st.append("laptop_gpu_memory=" + checkForCommas(laptop.getGpuMemory())+ c);
-		st.append("laptop_hdd_info=" + checkForCommas(laptop.getHdd())+ c);
 		st.append("laptop_hdd_size=" + checkForCommas(laptop.getHddSize()) + c);
 		st.append("laptop_optical=" + checkForCommas(laptop.getOptical()) + c);
 		st.append("laptop_os_filter=" + checkForCommas(laptop.getOsFilter()) + c);
@@ -230,8 +267,8 @@ public class StantekCSVMaker {
 		st.append("laptop_sound=" + checkForCommas(laptop.getAudio()) + c);
 		st.append("laptop_warranty=" + checkForCommas(laptop.getWarranty()) + c);
 		st.append("laptop_weight=" + checkForCommas(laptop.getWeight()) + c);
-		st.append("laptop_weight_filter=" + checkForCommas(laptop.getWeightFilter()) + c);
 		st.append("laptop_wifi=" + checkForCommas(laptop.getWifi()) + c);
+		st.append("gsm_manufacturer=" + laptop.getBrand() + c);
 		st.append("laptop_yes_no=" + generateYesNoFilter(laptop));
 		return st.toString();
 	}
@@ -258,7 +295,7 @@ public class StantekCSVMaker {
 			st.append("Bluetooth");
 		}
 		if(laptop.isWebcam()){
-			if(st.equals("")){
+			if(st.length() < 2){
 				st.append("Камера");
 			}
 			else{
@@ -266,7 +303,7 @@ public class StantekCSVMaker {
 			}
 		}
 		if(laptop.isSsd()){
-			if(st.equals("")){
+			if(st.length() < 2){
 				st.append("SSD");
 			}
 			else{
@@ -274,7 +311,7 @@ public class StantekCSVMaker {
 			}
 		}
 		if(laptop.isCardReader()){
-			if(st.equals("")){
+			if(st.length() < 2){
 				st.append("Четец за карти");
 			}
 			else{
@@ -282,7 +319,7 @@ public class StantekCSVMaker {
 			}
 		}
 		if(laptop.isFingerPrint()){
-			if(st.equals("")){
+			if(st.length() < 2){
 				st.append("Сензор за отпечатък");
 			}
 			else{
@@ -290,7 +327,7 @@ public class StantekCSVMaker {
 			}
 		}
 		if(laptop.isHdmi()){
-			if(st.equals("")){
+			if(st.length() < 2){
 				st.append("HDMI порт");
 			}
 			else{
@@ -298,7 +335,7 @@ public class StantekCSVMaker {
 			}
 		}
 		if(laptop.isOneLink()){
-			if(st.equals("")){
+			if(st.length() < 2){
 				st.append("OneLink порт");
 			}
 			else{
@@ -306,7 +343,7 @@ public class StantekCSVMaker {
 			}
 		}
 		if(laptop.isUsb3()){
-			if(st.equals("")){
+			if(st.length() < 2){
 				st.append("USB 3.0");
 			}
 			else{
@@ -314,7 +351,7 @@ public class StantekCSVMaker {
 			}
 		}
 		if(laptop.isRj45()){
-			if(st.equals("")){
+			if(st.length() < 2){
 				st.append("RJ-45 порт");
 			}
 			else{
@@ -322,7 +359,7 @@ public class StantekCSVMaker {
 			}
 		}
 		if(laptop.isSensorScreen()){
-			if(st.equals("")){
+			if(st.length() < 2){
 				st.append("Сензорен екран");
 			}
 			else{
@@ -330,7 +367,7 @@ public class StantekCSVMaker {
 			}
 		}
 		if(laptop.isKeyboardBacklit()){
-			if(st.equals("")){
+			if(st.length() < 2){
 				st.append("Подсветка на клавиатурата");
 			}
 			else{
