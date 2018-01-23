@@ -28,7 +28,7 @@ public class StantekXMLReader {
 
 	@Autowired
 	private StantekLaptopsBuilder builder;
-
+	
 	public String readXML(){
 		
 		URL url = null;
@@ -63,12 +63,12 @@ public class StantekXMLReader {
 		String gsmDis = stantek.getProperty("gsmDisplayCategory");
 		String gsmBat = stantek.getProperty("gsmBatteryCategory");
 		String gsmPar = stantek.getProperty("gsmPartsCategory");
-		ArrayList<Element> laptops = new ArrayList<Element>();
-		ArrayList<Element> tablets = new ArrayList<Element>();
-		ArrayList<Element> gsmAccessories = new ArrayList<Element>();
-		ArrayList<Element> gsmDisplay = new ArrayList<Element>();
-		ArrayList<Element> gsmBattery = new ArrayList<Element>();
-		ArrayList<Element> gsmParts = new ArrayList<Element>();
+		ArrayList laptops = new ArrayList();
+		ArrayList tablets = new ArrayList();
+		ArrayList gsmAccessories = new ArrayList();
+		ArrayList gsmDisplay = new ArrayList();
+		ArrayList gsmBattery = new ArrayList();
+		ArrayList gsmParts = new ArrayList();
 		for (int temp = 0; temp < nList.getLength(); temp++) {
 			Node nNode = nList.item(temp);
 			Element eElement = (Element) nNode;
@@ -104,9 +104,8 @@ public class StantekXMLReader {
 		response = response + "<br> GSM Display: " + gsmDisplay.size();
 		response = response + "<br> GSM Battery: " + gsmBattery.size();
 		response = response + "<br> GSM Parts: " + gsmParts.size();
-		
+			
 		String response1 = builder.parseXML(laptops);
-		
-		return response + "%n" + response1;
+		return response + "<br>" + response1;
 	}
 }

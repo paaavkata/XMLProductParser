@@ -18,139 +18,9 @@ import javax.imageio.ImageIO;
 import org.springframework.stereotype.Component;
 
 @Component
-public class StantekCSVMaker {
+public class StantekHelper {
 	
-	public String makeLaptopCSV(Set<Laptop> laptops){
-		laptops = downloadImages(laptops);
-		laptops = checkUniqueUrls(laptops);
-		PrintWriter pw = null;
-		try {
-		    pw = new PrintWriter(new File("Laptops.csv"));
-		} catch (FileNotFoundException e) {
-		    e.printStackTrace();
-		}
-		char c = ';';
-		StringBuilder st = new StringBuilder();
-		String firstRow = "sku" + c
-				+ "store_view_code" + c
-				+ "name" + c
-				+ "price" + c
-				+ "product_type" + c
-				+ "attribute_set_code" + c
-				+ "product_websites" + c
-				+ "qty" + c
-//				+ "additional_attributes" + c
-				
-				+ "product_online" + c
-				+ "tax_class_name" + c
-				+ "visibility" + c
-				+ "is_in_stock" + c
-				
-				+ "categories" + c
-				+ "short_description" + c
-				+ "url_key" + c
-				+ "meta_title" + c
-				+ "meta_description" + c
-				+ "weight" + c
-				
-				+ "base_image" + c
-				+ "base_image_label" + c
-				+ "small_image" + c
-				+ "small_image_label" + c
-				+ "thumbnail_image" + c
-				+ "thumbnail_image_label" + c;
-		st.append(firstRow);		
-//		st.append(firstRow + "\n");
-		
-		
-		st.append("hdd_razmer_filt_r_laptop" + c);
-		st.append("laptop_battery" + c);
-		st.append("laptop_cpu_filter" + c);
-		st.append("laptop_color" + c);
-		st.append("laptop_dimensions" + c);
-		st.append("laptop_display_info" + c);
-		st.append("laptop_display_resolution" + c);
-		st.append("laptop_display_size" + c);
-		st.append("laptop_gpu" + c);
-		st.append("laptop_gpu_memory" + c);
-		st.append("laptop_hdd_size" + c);
-		st.append("laptop_optical" + c);
-		st.append("laptop_os_filter" + c);
-		st.append("laptop_other_info" + c);
-		st.append("laptop_ports" + c);
-		st.append("laptop_processor" + c);
-		st.append("laptop_ram" + c);
-		st.append("laptop_ram_info" + c);
-		st.append("laptop_sound" + c);
-		st.append("laptop_warranty" + c);
-		st.append("laptop_weight" + c);
-		st.append("laptop_wifi" + c);
-		st.append("gsm_manufacturer" + c);
-		st.append("laptop_yes_no");
-		st.append("\n");
-		
-		
-		for(Laptop laptop : laptops){
-			st.append(laptop.getSku().trim() + c + c);
-			st.append(laptop.getName() + c);
-			st.append(String.valueOf(laptop.getPrice()) + c);
-			st.append("simple" + c);
-			st.append("Лаптопи" + c);
-			st.append("base" + c);
-			st.append("1" + c);	
-//			st.append(generateAttributes(laptop) + c);
-			st.append("1" + c);
-			st.append("Taxable goods" + c);
-			st.append("Catalog, Search" + c);
-			st.append("1" + c);
-			st.append("Главна директория,Главна директория/Лаптопи,Главна директория/Лаптопи/" + laptop.getBrand() + c);
-			st.append(checkForCommas(generateShortDescription(laptop)) + c);
-			st.append(laptop.getUrl() + c);
-			st.append(laptop.getName() + " на топ цена и на изплащане от Примиъм Мобайл ЕООД :: ревюта, характеристики, снимки" + c);
-			st.append("Можете да вземете " + laptop.getName() + " още днес на топ цена и на изплащане "
-					+ "с минимално оскъпяване и светкавично одобрение от PremiumMobile.bg. "
-					+ "Бърза доставка на следващия ден и любезно обслужване." + c);
-			st.append(laptop.getWeight() + c);
-			st.append(laptop.getImages().get(0) + c);
-			st.append(laptop.getName() + " топ цена на изплащане"+ c);
-			st.append(laptop.getImages().get(0) + c);
-			st.append(laptop.getName() + " топ цена на изплащане"+ c);
-			st.append(laptop.getImages().get(0) + c);
-			st.append(laptop.getName() + " топ цена на изплащане" + c);
-			//23
-			st.append(checkForCommas(laptop.getHddFilter()) + c);
-			st.append(checkForCommas(laptop.getBattery()) + c);
-			st.append(checkForCommas(laptop.getCpuFilter())+ c);
-			st.append(checkForCommas(laptop.getColor()) + c);
-			st.append(checkForCommas(laptop.getDimensions())+ c);
-			st.append(checkForCommas(laptop.getDisplayInfo())+ c);
-			st.append(checkForCommas(laptop.getDisplayResolution())+ c);
-			st.append(checkForCommas(laptop.getDisplaySize()) + c);
-			st.append(checkForCommas(laptop.getGpu())+ c);
-			st.append(checkForCommas(laptop.getGpuMemory())+ c);
-			st.append(checkForCommas(laptop.getHddSize()) + c);
-			st.append(checkForCommas(laptop.getOptical()) + c);
-			st.append(checkForCommas(laptop.getOsFilter()) + c);
-			st.append(checkForCommas(laptop.getOtherInfo()) + c);
-			st.append(checkForCommas(laptop.getPorts()) + c);
-			st.append(checkForCommas(laptop.getCpu()) + c);
-			st.append(checkForCommas(laptop.getMemoryRam()) + c);
-			st.append(checkForCommas(laptop.getMemoryInfo()) + c);
-			st.append(checkForCommas(laptop.getAudio()) + c);
-			st.append(checkForCommas(laptop.getWarranty()) + c);
-			st.append(checkForCommas(laptop.getWeight()) + c);
-			st.append(checkForCommas(laptop.getWifi()) + c);
-			st.append(laptop.getBrand() + c);
-			st.append(generateYesNoFilter(laptop));
-			
-			st.append((char) 012);
-		}
-		pw.write(st.toString());
-		pw.close();
-		return "response";
-	}
-	
-	private Set checkUniqueUrls(Set<Laptop> products) {
+	public Set checkUniqueUrls(Set<Laptop> products) {
 		HashMap<String, LocalProduct> mappedProducts = new HashMap<String, LocalProduct>();
 		int count = 1;
 		for(LocalProduct product : products) {
@@ -166,7 +36,7 @@ public class StantekCSVMaker {
 		return products;
 	}
 
-	private Set downloadImages(Set<Laptop> products) {
+	public Set downloadImages(Set<Laptop> products) {
 		int imageCounter = 1;
 		for (LocalProduct product : products){
 			if(product.getImages().size() > 1){
@@ -190,19 +60,19 @@ public class StantekCSVMaker {
 //				laptop.setImages(images);
 			}
 			else{
-				ArrayList<String> images= new ArrayList<String>();
+				ArrayList<String> images = new ArrayList<String>();
 				String imageName = "image" + imageCounter + ".jpg";
 				try {
-				URL url = new URL(product.getImages().get(0));
-		        BufferedImage img = ImageIO.read(url);
-		        File file = new File("c:\\images\\" + imageName);
-		        if(img == null || file == null) {
-		        	continue;
-		        }
-		        ImageIO.write(img, "jpg", file);
-		        
-			    images.add(imageName);
-			    product.setImages(images);
+					URL url = new URL(product.getImages().get(0));
+			        BufferedImage img = ImageIO.read(url);
+			        File file = new File("c:\\images\\" + imageName);
+			        if(img == null || file == null) {
+			        	continue;
+			        }
+			        ImageIO.write(img, "jpg", file);
+			        
+				    images.add(imageName);
+				    product.setImages(images);
 				}
 				catch(IOException e){
 					System.out.println(e.getMessage());
@@ -215,7 +85,7 @@ public class StantekCSVMaker {
 		return products;
 	}
 
-	private String generateShortDescription(Laptop laptop){
+	public String generateShortDescription(Laptop laptop){
 		StringBuilder st = new StringBuilder();
 		st.append("<ul class=\"short-description-list smartphone\"><div class=\"row\"><div class=\"col-md-2 col-md-offset-1\"><li class=\"display-size\">");
 		st.append(laptop.getDisplaySize().replaceAll("$quot", "").replaceAll("$apos", ""));
@@ -273,7 +143,7 @@ public class StantekCSVMaker {
 		return st.toString();
 	}
 	
-	private String checkForCommas(String text) {
+	public String checkForCommas(String text) {
 		StringBuilder st = new StringBuilder();
 		if(text == null){
 			return "";
@@ -288,7 +158,7 @@ public class StantekCSVMaker {
 		return st.toString().trim();
 	}
 
-	private String generateYesNoFilter(Laptop laptop){
+	public String generateYesNoFilter(Laptop laptop){
 		
 		StringBuilder st = new StringBuilder();
 		if(laptop.getBluetooth()){

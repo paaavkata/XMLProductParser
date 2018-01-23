@@ -19,7 +19,10 @@ public class StantekLaptopsBuilder {
 	private PropertiesLoader propertiesLoader;
 	
 	@Autowired
-	private StantekCSVMaker csvMaker;
+	private CsvMaker csvMaker;
+	
+	@Autowired
+	private MagentoProductMaker maker;
 	
 	public String parseXML(ArrayList<Element> products) {
 		String result = new String();
@@ -28,7 +31,7 @@ public class StantekLaptopsBuilder {
 			HashSet<Laptop> laptops = new HashSet<Laptop>();
 			for (Element e : products) {
 				String name = e.getElementsByTagName("Title").item(0).getTextContent();
-				String image = e.getElementsByTagName("Image").item(0).getTextContent();
+				
 				String description = e.getElementsByTagName("Description").item(0).getTextContent();
 				Double clientPrice = Double.parseDouble(e.getElementsByTagName("RetailPriceWithVAT").item(0).getTextContent());
 //				Double myPrice = Double.parseDouble(e.getElementsByTagName("YourPriceWithoutVAT").item(0).getTextContent());
@@ -122,7 +125,8 @@ public class StantekLaptopsBuilder {
 				else{
 					laptop.setBrand("HP");
 				}
-
+				//IMAGES
+				String image = e.getElementsByTagName("Image").item(0).getTextContent();
 				if(!image.isEmpty()){
 					if(laptop.getImages() == null){
 						laptop.setImages(new ArrayList<String>());
@@ -596,7 +600,8 @@ public class StantekLaptopsBuilder {
 				
 			}
 			System.out.println("Laptops: " + laptops.size());
-			result = csvMaker.makeLaptopCSV(laptops);
+//			result = csvMaker.makeLaptopCSV(laptops);
+//			result = maker.uploadProductsToProduction(laptops);
 			
 		} catch (Exception e) {
 			e.printStackTrace();

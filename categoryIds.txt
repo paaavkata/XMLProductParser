@@ -1,0 +1,475 @@
+{
+    "id": 2,
+    "parent_id": 1,
+    "name": "Главна директория",
+    "is_active": true,
+    "position": 1,
+    "level": 1,
+    "product_count": 1057,
+    "children_data": [
+        {
+            "id": 3,
+            "parent_id": 2,
+            "name": "Смартфони",
+            "is_active": true,
+            "position": 1,
+            "level": 2,
+            "product_count": 1061,
+            "children_data": [
+                {
+                    "id": 7,
+                    "parent_id": 3,
+                    "name": "Apple",
+                    "is_active": true,
+                    "position": 1,
+                    "level": 3,
+                    "product_count": 148,
+                    "children_data": []
+                },
+                {
+                    "id": 8,
+                    "parent_id": 3,
+                    "name": "Samsung",
+                    "is_active": true,
+                    "position": 2,
+                    "level": 3,
+                    "product_count": 189,
+                    "children_data": []
+                },
+                {
+                    "id": 12,
+                    "parent_id": 3,
+                    "name": "Huawei",
+                    "is_active": true,
+                    "position": 3,
+                    "level": 3,
+                    "product_count": 117,
+                    "children_data": []
+                },
+                {
+                    "id": 9,
+                    "parent_id": 3,
+                    "name": "Sony",
+                    "is_active": true,
+                    "position": 4,
+                    "level": 3,
+                    "product_count": 138,
+                    "children_data": []
+                },
+                {
+                    "id": 10,
+                    "parent_id": 3,
+                    "name": "HTC",
+                    "is_active": true,
+                    "position": 5,
+                    "level": 3,
+                    "product_count": 149,
+                    "children_data": []
+                },
+                {
+                    "id": 11,
+                    "parent_id": 3,
+                    "name": "LG",
+                    "is_active": true,
+                    "position": 6,
+                    "level": 3,
+                    "product_count": 96,
+                    "children_data": []
+                },
+                {
+                    "id": 13,
+                    "parent_id": 3,
+                    "name": "Lenovo",
+                    "is_active": true,
+                    "position": 7,
+                    "level": 3,
+                    "product_count": 54,
+                    "children_data": []
+                },
+                {
+                    "id": 14,
+                    "parent_id": 3,
+                    "name": "Blackberry",
+                    "is_active": true,
+                    "position": 8,
+                    "level": 3,
+                    "product_count": 46,
+                    "children_data": []
+                },
+                {
+                    "id": 17,
+                    "parent_id": 3,
+                    "name": "Microsoft",
+                    "is_active": true,
+                    "position": 9,
+                    "level": 3,
+                    "product_count": 22,
+                    "children_data": []
+                },
+                {
+                    "id": 15,
+                    "parent_id": 3,
+                    "name": "Motorola",
+                    "is_active": true,
+                    "position": 10,
+                    "level": 3,
+                    "product_count": 37,
+                    "children_data": []
+                },
+                {
+                    "id": 16,
+                    "parent_id": 3,
+                    "name": "CAT",
+                    "is_active": true,
+                    "position": 11,
+                    "level": 3,
+                    "product_count": 8,
+                    "children_data": []
+                },
+                {
+                    "id": 20,
+                    "parent_id": 3,
+                    "name": "Nokia",
+                    "is_active": true,
+                    "position": 12,
+                    "level": 3,
+                    "product_count": 46,
+                    "children_data": []
+                },
+                {
+                    "id": 19,
+                    "parent_id": 3,
+                    "name": "Google",
+                    "is_active": true,
+                    "position": 13,
+                    "level": 3,
+                    "product_count": 11,
+                    "children_data": []
+                },
+                {
+                    "id": 18,
+                    "parent_id": 3,
+                    "name": "Други",
+                    "is_active": true,
+                    "position": 14,
+                    "level": 3,
+                    "product_count": 0,
+                    "children_data": []
+                }
+            ]
+        },
+        {
+            "id": 4,
+            "parent_id": 2,
+            "name": "Лаптопи",
+            "is_active": true,
+            "position": 2,
+            "level": 2,
+            "product_count": 0,
+            "children_data": [
+                {
+                    "id": 21,
+                    "parent_id": 4,
+                    "name": "ACER",
+                    "is_active": true,
+                    "position": 1,
+                    "level": 3,
+                    "product_count": 0,
+                    "children_data": []
+                },
+                {
+                    "id": 22,
+                    "parent_id": 4,
+                    "name": "Apple",
+                    "is_active": true,
+                    "position": 2,
+                    "level": 3,
+                    "product_count": 0,
+                    "children_data": []
+                },
+                {
+                    "id": 23,
+                    "parent_id": 4,
+                    "name": "ASUS",
+                    "is_active": true,
+                    "position": 3,
+                    "level": 3,
+                    "product_count": 0,
+                    "children_data": []
+                },
+                {
+                    "id": 24,
+                    "parent_id": 4,
+                    "name": "DELL",
+                    "is_active": true,
+                    "position": 4,
+                    "level": 3,
+                    "product_count": 0,
+                    "children_data": []
+                },
+                {
+                    "id": 25,
+                    "parent_id": 4,
+                    "name": "HP",
+                    "is_active": true,
+                    "position": 5,
+                    "level": 3,
+                    "product_count": 0,
+                    "children_data": []
+                },
+                {
+                    "id": 26,
+                    "parent_id": 4,
+                    "name": "Lenovo",
+                    "is_active": true,
+                    "position": 6,
+                    "level": 3,
+                    "product_count": 0,
+                    "children_data": []
+                },
+                {
+                    "id": 27,
+                    "parent_id": 4,
+                    "name": "Sony",
+                    "is_active": true,
+                    "position": 7,
+                    "level": 3,
+                    "product_count": 0,
+                    "children_data": []
+                },
+                {
+                    "id": 28,
+                    "parent_id": 4,
+                    "name": "Toshiba",
+                    "is_active": true,
+                    "position": 8,
+                    "level": 3,
+                    "product_count": 0,
+                    "children_data": []
+                }
+            ]
+        },
+        {
+            "id": 5,
+            "parent_id": 2,
+            "name": "Таблети",
+            "is_active": true,
+            "position": 3,
+            "level": 2,
+            "product_count": 0,
+            "children_data": [
+                {
+                    "id": 29,
+                    "parent_id": 5,
+                    "name": "Apple",
+                    "is_active": true,
+                    "position": 1,
+                    "level": 3,
+                    "product_count": 0,
+                    "children_data": []
+                },
+                {
+                    "id": 31,
+                    "parent_id": 5,
+                    "name": "Acer",
+                    "is_active": true,
+                    "position": 2,
+                    "level": 3,
+                    "product_count": 0,
+                    "children_data": []
+                },
+                {
+                    "id": 32,
+                    "parent_id": 5,
+                    "name": "Samsung",
+                    "is_active": true,
+                    "position": 3,
+                    "level": 3,
+                    "product_count": 0,
+                    "children_data": []
+                },
+                {
+                    "id": 33,
+                    "parent_id": 5,
+                    "name": "Asus",
+                    "is_active": true,
+                    "position": 4,
+                    "level": 3,
+                    "product_count": 0,
+                    "children_data": []
+                },
+                {
+                    "id": 34,
+                    "parent_id": 5,
+                    "name": "Sony",
+                    "is_active": true,
+                    "position": 5,
+                    "level": 3,
+                    "product_count": 0,
+                    "children_data": []
+                },
+                {
+                    "id": 35,
+                    "parent_id": 5,
+                    "name": "Huawei",
+                    "is_active": true,
+                    "position": 6,
+                    "level": 3,
+                    "product_count": 0,
+                    "children_data": []
+                },
+                {
+                    "id": 36,
+                    "parent_id": 5,
+                    "name": "LG",
+                    "is_active": true,
+                    "position": 7,
+                    "level": 3,
+                    "product_count": 0,
+                    "children_data": []
+                },
+                {
+                    "id": 37,
+                    "parent_id": 5,
+                    "name": "Lenovo",
+                    "is_active": true,
+                    "position": 8,
+                    "level": 3,
+                    "product_count": 0,
+                    "children_data": []
+                }
+            ]
+        },
+        {
+            "id": 6,
+            "parent_id": 2,
+            "name": "Аксесоари",
+            "is_active": true,
+            "position": 4,
+            "level": 2,
+            "product_count": 0,
+            "children_data": [
+                {
+                    "id": 38,
+                    "parent_id": 6,
+                    "name": "Калъфи/Case",
+                    "is_active": true,
+                    "position": 1,
+                    "level": 3,
+                    "product_count": 0,
+                    "children_data": []
+                },
+                {
+                    "id": 39,
+                    "parent_id": 6,
+                    "name": "Протектори",
+                    "is_active": true,
+                    "position": 2,
+                    "level": 3,
+                    "product_count": 0,
+                    "children_data": []
+                },
+                {
+                    "id": 40,
+                    "parent_id": 6,
+                    "name": "HandsFree",
+                    "is_active": true,
+                    "position": 3,
+                    "level": 3,
+                    "product_count": 0,
+                    "children_data": []
+                },
+                {
+                    "id": 41,
+                    "parent_id": 6,
+                    "name": "Зарядни устройства",
+                    "is_active": true,
+                    "position": 4,
+                    "level": 3,
+                    "product_count": 0,
+                    "children_data": []
+                },
+                {
+                    "id": 42,
+                    "parent_id": 6,
+                    "name": "Power Bank",
+                    "is_active": true,
+                    "position": 5,
+                    "level": 3,
+                    "product_count": 0,
+                    "children_data": []
+                },
+                {
+                    "id": 43,
+                    "parent_id": 6,
+                    "name": "Други",
+                    "is_active": true,
+                    "position": 6,
+                    "level": 3,
+                    "product_count": 0,
+                    "children_data": []
+                },
+                {
+                    "id": 44,
+                    "parent_id": 6,
+                    "name": "Слушалки",
+                    "is_active": true,
+                    "position": 7,
+                    "level": 3,
+                    "product_count": 0,
+                    "children_data": []
+                },
+                {
+                    "id": 45,
+                    "parent_id": 6,
+                    "name": "Чанти за лаптоп",
+                    "is_active": true,
+                    "position": 8,
+                    "level": 3,
+                    "product_count": 0,
+                    "children_data": []
+                },
+                {
+                    "id": 46,
+                    "parent_id": 6,
+                    "name": "Мишки и клавиатури",
+                    "is_active": true,
+                    "position": 9,
+                    "level": 3,
+                    "product_count": 0,
+                    "children_data": []
+                },
+                {
+                    "id": 47,
+                    "parent_id": 6,
+                    "name": "Софтуер",
+                    "is_active": true,
+                    "position": 10,
+                    "level": 3,
+                    "product_count": 0,
+                    "children_data": []
+                }
+            ]
+        },
+        {
+            "id": 48,
+            "parent_id": 2,
+            "name": "Дронове",
+            "is_active": true,
+            "position": 5,
+            "level": 2,
+            "product_count": 0,
+            "children_data": []
+        },
+        {
+            "id": 49,
+            "parent_id": 2,
+            "name": "Premium модели",
+            "is_active": true,
+            "position": 6,
+            "level": 2,
+            "product_count": 15,
+            "children_data": []
+        }
+    ]
+}

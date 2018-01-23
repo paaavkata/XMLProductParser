@@ -34,18 +34,21 @@
 		    <artifactId>jaxp-api</artifactId>
 		    <version>1.4.5</version>
 		</dependency>
-
+		<dependency>
+		    <groupId>org.simpleframework</groupId>
+		    <artifactId>simple-xml</artifactId>
+		    <version>2.7.1</version>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-		    <groupId>com.github.chen0040</groupId>
-		    <artifactId>java-magento-client</artifactId>
-		    <version>1.0.12</version>
+		    <groupId>org.apache.httpcomponents</groupId>
+		    <artifactId>httpclient</artifactId>
+		    <version>4.5.4</version>
 		</dependency>
-	
 	</dependencies>
 
 	<build>

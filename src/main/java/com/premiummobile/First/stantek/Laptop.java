@@ -310,16 +310,16 @@ public class Laptop extends LocalProduct{
 			super.setBrand("Lenovo");
 		}
 		if(brand.contains("cer")){
-			super.setBrand("Acer");
+			super.setBrand("ACER");
 		}
 		if(brand.contains("HP")){
 			super.setBrand("HP");
 		}
 		if(brand.contains("ell")){
-			super.setBrand("Dell");
+			super.setBrand("DELL");
 		}
 		if(brand.contains("sus")){
-			super.setBrand("Asus");
+			super.setBrand("ASUS");
 		}
 		if(brand.contains("pple")){
 			super.setBrand("Apple");

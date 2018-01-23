@@ -1,6 +1,5 @@
 package com.premiummobile.First.controllers;
 
-import java.io.IOException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,19 +7,20 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.premiummobile.First.emails.EmailsConverter;
-import com.premiummobile.First.emails.Order;
+import com.premiummobile.First.solytron.MainDownloader;
+import com.premiummobile.First.solytron.Model.SolytronProduct;
 
 @Controller
-public class MainController {
+public class SolytronController {
 	
 	@Autowired
-	private EmailsConverter converter;
+	private MainDownloader downloader;
 	
-	@GetMapping("/readmails")
+	@GetMapping("/readCategories")
 	@ResponseBody
-	public List<Order> readXML() throws IOException{
-		List<Order> response = converter.convertEmail();
+	public List<Object> readXML() throws Exception{
+		List<Object> response = downloader.downloadCategories();
+		
 		return response;
 	}
 }
