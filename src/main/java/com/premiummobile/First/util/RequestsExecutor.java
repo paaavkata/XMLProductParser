@@ -99,11 +99,11 @@ public class RequestsExecutor {
 		
 	}
 	
-	public SolytronProduct getProductSolytron(String code) throws Exception{
+	public SolytronProduct getProductSolytron(SolytronProduct product) throws Exception{
 		CloseableHttpResponse response;
-		HttpGet httpGet = generateGetRequest(code, "product", "solytron");
+		HttpGet httpGet = generateGetRequest(product.getProductId(), "product", "solytron");
 		response = getClient().execute(httpGet);
-		SolytronProduct product = getSerializer().read(SolytronProduct.class, response.getEntity().getContent());
+		product = getSerializer().read(SolytronProduct.class, response.getEntity().getContent());
 		return product;
 	}
 	

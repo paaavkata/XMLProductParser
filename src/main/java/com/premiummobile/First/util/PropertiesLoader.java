@@ -16,16 +16,23 @@ public class PropertiesLoader {
 	private final String solytronFile = "solytron.properties";
 	private final String stantekFile = "stantek.properties";
 	private final String magentoAttributesFile = "magento2attr.properties";
+	private final String solytronLaptop = "solytronLaptop.properties";
+	
+	@Bean
+	public Properties getSolytronLaptop(){
+		return load(solytronLaptop);
+	}
 	
 	@Bean
 	public Properties getSolytron(){
-		
 		return load(solytronFile);
 	}
+	
 	@Bean
 	public Properties getStantek(){
 		return load(stantekFile);
 	}
+	
 	@Bean
 	public Properties getMagento(){
 		return load(magentoAttributesFile);

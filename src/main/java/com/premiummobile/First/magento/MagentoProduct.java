@@ -13,19 +13,7 @@ public class MagentoProduct {
 	private Integer attributeSetId;
 	private Double price;
 	@JsonProperty("special_price")
-	private Integer specialPrice;
-	public Double getPrice() {
-		return price;
-	}
-	public void setPrice(Double price) {
-		this.price = price;
-	}
-	public int getSpecialPrice() {
-		return specialPrice;
-	}
-	public void setSpecialPrice(int specialPrice) {
-		this.specialPrice = specialPrice;
-	}
+	private Double specialPrice;
 	private Integer status;
 	private Integer visibility;
 	@JsonProperty("type_id")
@@ -44,6 +32,18 @@ public class MagentoProduct {
 	private List<Attribute> customAttributes;
 	
 	
+	public Double getPrice() {
+		return price;
+	}
+	public void setPrice(Double price) {
+		this.price = price;
+	}
+	public Double getSpecialPrice() {
+		return specialPrice;
+	}
+	public void setSpecialPrice(Double specialPrice) {
+		this.specialPrice = specialPrice;
+	}
 	public Integer getId() {
 		return id;
 	}
