@@ -1,11 +1,17 @@
 package com.premiummobile.First.solytron;
 
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.regex.Pattern;
+
+import javax.imageio.ImageIO;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -16,6 +22,8 @@ import com.premiummobile.First.magento.Attribute;
 import com.premiummobile.First.magento.ExtensionAttribute;
 import com.premiummobile.First.magento.MagentoProduct;
 import com.premiummobile.First.magento.MagentoStockItem;
+import com.premiummobile.First.magento.MediaGalleryEntry;
+import com.premiummobile.First.solytron.Model.Image;
 import com.premiummobile.First.solytron.Model.Property;
 import com.premiummobile.First.solytron.Model.SolytronProduct;
 import com.premiummobile.First.util.PropertiesLoader;
@@ -40,6 +48,8 @@ public class MagentoMapper {
 		for(Property property : product.getProperties().get(1).getList()){
 			properties.put(property.getPropertyId(), property.getValue().get(0).getText());
 		}
+		magentoProduct.setStatus(1);
+		magentoProduct.setVisibility(4);
 		magentoProduct.setAttributeSetId(10);
 		magentoProduct.setSku(product.getCodeId());
 		if(product.getPriceEndUser() != null){
@@ -82,8 +92,69 @@ public class MagentoMapper {
 		magentoProduct.setExtensionAttributes(new ArrayList<ExtensionAttribute>());
 		magentoProduct.getExtensionAttributes().add(magentoStockItem);
 		magentoProduct.setCustomAttributes(generateAttributes(product.getProperties().get(1).getList()));
+		
+		KeyValueAttribute metaTitle = new KeyValueAttribute();
+		metaTitle.setAttributeCode("meta_title");
+		metaTitle.setValue(magentoProduct.getName() + " на топ цена и на изплащане от Примиъм Мобайл ЕООД - ревю, мнения, характеристики");
+		magentoProduct.getCustomAttributes().add(metaTitle);
+		
+		KeyValueAttribute metaDescription = new KeyValueAttribute();
+		metaDescription.setAttributeCode("meta_description");
+		metaDescription.setValue("Купете днес " + magentoProduct.getName() + " на изплащане с минимално оскъпяване и светкавично одобрение от PremiumMobile.bg. Бърза доставка на следващия ден и любезно обслужване.");
+		magentoProduct.getCustomAttributes().add(metaDescription);
+		
 		magentoProduct.getCustomAttributes().add(generateBrand(product.getVendor()));
+		int counter = 1;
+		List<MediaGalleryEntry> images = new ArrayList<MediaGalleryEntry>();
+		for(Image image : product.getImages()){
+			String imageName = magentoProduct.getSku() + counter + ".jpg";
+			try {
+				URL url = new URL(image.getText());
+		        BufferedImage img = ImageIO.read(url);
+		        File file = new File("c:\\images\\" + imageName);
+		        if(img == null || file == null) {
+		        	System.out.println("Image can't be downloaded");
+		        	continue;
+		        }
+		        MediaGalleryEntry entry = new MediaGalleryEntry();
+		        entry.setMediaType("image");
+		        entry.setDisabled(false);
+		        entry.setLabel(magentoProduct.getName() + " на топ цена и на изплащане от Примиъм Мобайл ЕООД");
+		        entry.setPosition(counter);
+		        if( counter == 1 ){
+		        	ArrayList<String> types = new ArrayList<String>();
+		        	types.add("image");
+		        	types.add("small_image");
+		        	types.add("thumbnail");
+		        	entry.setTypes(types);
+		        }
+		        ImageIO.write(img, "jpg", file);
+		        entry.setFileName("laptops/" + imageName);
+		        images.add(entry);
+			}
+			catch(IOException e){
+				System.out.println(e.getMessage());
+			}
+		
+		}
+		magentoProduct.setMediaGalleryEntries(images);
 		return magentoProduct;
+	}
+
+	private String generateShortDescription(String displaySize, String cpu, String ram, String hdd, String battery) {
+		StringBuilder st = new StringBuilder();
+		st.append("<ul class=\"short-description-list smartphone\"><div class=\"row\"><div class=\"col-md-2 col-md-offset-1\"><li class=\"display-size\">");
+		st.append(displaySize);
+		st.append("</li></div><div class=\"col-md-2\"><li class=\"processor\">");
+		st.append(cpu);
+		st.append("</li></div><div class=\"col-md-2\"><li class=\"memory\">");
+		st.append(ram);
+		st.append("</li></div><div class=\"col-md-2\"><li class=\"hdd\">");
+		st.append(hdd);
+		st.append("</li></div><div class=\"col-md-2\"><li class=\"battery\">");
+		st.append(battery);
+		st.append("</li></div></div></ul>");
+		return st.toString();
 	}
 
 	private List<Attribute> generateAttributes(List<Property> productProperties) {
@@ -285,6 +356,12 @@ public class MagentoMapper {
 		customAttributes.add(ports);
 		otherInfo.setValue(otherInfoString.toString());
 		customAttributes.add(otherInfo);
+		
+		KeyValueAttribute shortDescription = new KeyValueAttribute();
+		shortDescription.setAttributeCode("short_description");
+		shortDescription.setValue(generateShortDescription(displaySize.getValues().get(0), cpuFilter.getValues().get(0), 
+				ram.getValues().get(0), hddSize.getValue(), battery.getValue()));
+		customAttributes.add(shortDescription);
 		
 		return customAttributes;
 	}

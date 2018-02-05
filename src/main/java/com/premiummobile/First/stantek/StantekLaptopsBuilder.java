@@ -21,9 +21,9 @@ public class StantekLaptopsBuilder {
 	@Autowired
 	private CsvMaker csvMaker;
 	
-	@Autowired
-	private MagentoProductMaker maker;
-	
+//	@Autowired
+//	private MagentoProductMaker maker;
+//	
 	public String parseXML(ArrayList<Element> products) {
 		String result = new String();
 		final Properties stantekProperties = propertiesLoader.getStantek();

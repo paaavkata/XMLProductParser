@@ -7,6 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.premiummobile.First.magento.MagentoProduct;
 import com.premiummobile.First.solytron.MainDownloader;
 import com.premiummobile.First.solytron.Model.SolytronProduct;
 
@@ -18,8 +19,8 @@ public class SolytronController {
 	
 	@GetMapping("/readCategories")
 	@ResponseBody
-	public List<Object> readXML() throws Exception{
-		List<Object> response = downloader.downloadCategories();
+	public List<MagentoProduct> readXML() throws Exception{
+		List<MagentoProduct> response = downloader.downloadCategories();
 		
 		return response;
 	}

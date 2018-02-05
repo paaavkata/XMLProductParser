@@ -19,7 +19,7 @@ public class MainDownloader {
 	
 	
 	@Autowired
-	private RequestsExecutor downloader;
+	private RequestsExecutor requestExecutor;
 	
 	@Autowired
 	private PropertiesLoader propertiesLoader;
@@ -30,16 +30,17 @@ public class MainDownloader {
 	@Autowired
 	private ObjectMapper om;
 	
-	public List<Object> downloadCategories() throws Exception{
+	public List<MagentoProduct> downloadCategories() throws Exception{
 		Properties properties = propertiesLoader.getSolytron();
-		ProductSet productSet = downloader.getCategorySolytron(properties.getProperty("pc.laptop"));
+		ProductSet productSet = requestExecutor.getCategorySolytron(properties.getProperty("pc.laptop"));
 		List<SolytronProduct> products = productSet.getProducts();
 		int productCounter = 0;
 		int productsSize = products.size();
 		List<SolytronProduct> productsNew = new ArrayList<SolytronProduct>();
+		List<MagentoProduct> magentoProducts = new ArrayList<MagentoProduct>();
 		for(SolytronProduct productSimple : products){
 			productCounter++;
-			SolytronProduct product = downloader.getProductSolytron(productSimple);
+			SolytronProduct product = requestExecutor.getProductSolytron(productSimple);
 			product.setPrice(productSimple.getPrice());
 			product.setGroupId(productSimple.getProductId());
 			product.setCodeId(productSimple.getCodeId());
@@ -53,15 +54,17 @@ public class MainDownloader {
 //			System.out.println(productCounter + " " + String.valueOf(((float) productCounter/productsSize)*100).substring(0, 1) + "%");
 //			System.out.print("\r");
 			MagentoProduct magentoProduct = magentoMapper.mapProduct(product);
-			String json = om.writeValueAsString(magentoProduct);
-			System.out.println(json);
-//			if(productCounter >= 30){
-//				break;
-//			}
+			magentoProducts.add(magentoProduct);
+//			String json = om.writeValueAsString(magentoProduct);
+//			System.out.println(json);
+			requestExecutor.postMagentoProduct(magentoProduct);
+			if(productCounter >= 5){
+				break;
+			}
 			productsNew.add(product);
 		}
-		List<Object> results = new ArrayList<Object>();
-		results.add(productsNew);
-		return results;
+//		List<Object> products = new ArrayList<Object>();
+//		products.add(productsNew);
+		return magentoProducts;
 	}
 }
