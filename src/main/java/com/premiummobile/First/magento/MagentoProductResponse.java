@@ -2,9 +2,11 @@ package com.premiummobile.First.magento;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class MagentoProduct {
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class MagentoProductResponse {
 
 	private Integer id;
 	private String sku;

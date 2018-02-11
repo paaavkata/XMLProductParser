@@ -8,7 +8,7 @@ target/
 .project
 .settings
 .springBeans
-
+.properties
 ### IntelliJ IDEA ###
 .idea
 *.iws
@@ -22,4 +22,4 @@ nbbuild/
 dist/
 nbdist/
 .nb-gradle/
-/src/main/java/util/solytron.properties
+/src/main/resources

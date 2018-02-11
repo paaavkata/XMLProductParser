@@ -1,6 +1,7 @@
 package com.premiummobile.First.solytron;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 
@@ -8,8 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.premiummobile.First.magento.MagentoProduct;
-import com.premiummobile.First.solytron.Model.ProductSet;
+import com.premiummobile.First.magento.MagentoProductRequest;
 import com.premiummobile.First.solytron.Model.SolytronProduct;
 import com.premiummobile.First.util.PropertiesLoader;
 import com.premiummobile.First.util.RequestsExecutor;
@@ -18,28 +18,33 @@ import com.premiummobile.First.util.RequestsExecutor;
 public class MainDownloader {
 	
 	
-	@Autowired
 	private RequestsExecutor requestExecutor;
 	
-	@Autowired
-	private PropertiesLoader propertiesLoader;
+	private PropertiesLoader loader;
 	
-	@Autowired
 	private MagentoMapper magentoMapper;
 	
-	@Autowired
 	private ObjectMapper om;
 	
-	public List<MagentoProduct> downloadCategories() throws Exception{
-		Properties properties = propertiesLoader.getSolytron();
-		ProductSet productSet = requestExecutor.getCategorySolytron(properties.getProperty("pc.laptop"));
-		List<SolytronProduct> products = productSet.getProducts();
-		int productCounter = 0;
-		int productsSize = products.size();
+	private HashMap<String, String> solytronCategories;
+	
+	@Autowired
+	public MainDownloader(RequestsExecutor requestExecutor, PropertiesLoader loader, MagentoMapper magentoMapper,ObjectMapper om){
+		this.requestExecutor = requestExecutor;
+		this.loader = loader;
+		this.magentoMapper = magentoMapper;
+		this.om = om;
+		solytronCategories = loader.getSolytronCategories();
+	}
+	public int downloadCategory(String category) throws Exception{
+		List<SolytronProduct> categoryProducts = requestExecutor.getCategorySolytron(solytronCategories.get(category));
+//		int productCounter = 0;
+//		int productsSize = products.size();
 		List<SolytronProduct> productsNew = new ArrayList<SolytronProduct>();
-		List<MagentoProduct> magentoProducts = new ArrayList<MagentoProduct>();
-		for(SolytronProduct productSimple : products){
-			productCounter++;
+		List<MagentoProductRequest> magentoProducts = new ArrayList<MagentoProductRequest>();
+		for(SolytronProduct productSimple : categoryProducts){
+			long time = System.currentTimeMillis();
+//			productCounter++;
 			SolytronProduct product = requestExecutor.getProductSolytron(productSimple);
 			product.setPrice(productSimple.getPrice());
 			product.setGroupId(productSimple.getProductId());
@@ -51,20 +56,26 @@ public class MainDownloader {
 			product.setPriceEndUser(productSimple.getPriceEndUser());
 			product.setStockInfoData(productSimple.getStockInfoData());
 			product.setStockInfoValue(productSimple.getStockInfoValue());
-//			System.out.println(productCounter + " " + String.valueOf(((float) productCounter/productsSize)*100).substring(0, 1) + "%");
-//			System.out.print("\r");
-			MagentoProduct magentoProduct = magentoMapper.mapProduct(product);
-			magentoProducts.add(magentoProduct);
-//			String json = om.writeValueAsString(magentoProduct);
-//			System.out.println(json);
-			requestExecutor.postMagentoProduct(magentoProduct);
-			if(productCounter >= 5){
-				break;
-			}
+			MagentoProductRequest magentoProduct = magentoMapper.mapProduct(product, category);
+//			magentoProducts.add(magentoProduct);
+			requestExecutor.newMagentoProduct(magentoProduct);
+			magentoMapper.downloadImages(product, magentoProduct);
+//			if(productCounter >= 10){
+//				break;
+//			}
 			productsNew.add(product);
+			long time2 = System.currentTimeMillis();
+			System.out.println("Total time: " + (time2-time));
+			System.out.println("==========================");
 		}
-//		List<Object> products = new ArrayList<Object>();
-//		products.add(productsNew);
-		return magentoProducts;
+		if(productsNew.size() != 0){
+			return productsNew.size();
+		}
+		return -1;
+	}
+
+	public List<String> downloadMagentoAttributes() throws Exception {
+		List<String> attributes = requestExecutor.downloadMagentoAttributes();
+		return null;
 	}
 }

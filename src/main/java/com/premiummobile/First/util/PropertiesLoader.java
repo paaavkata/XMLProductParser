@@ -5,6 +5,9 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 
 import org.springframework.context.annotation.Bean;
@@ -13,32 +16,50 @@ import org.springframework.stereotype.Component;
 @Component
 public class PropertiesLoader {
 	
-	private final String solytronFile = "solytron.properties";
-	private final String stantekFile = "stantek.properties";
-	private final String magentoAttributesFile = "magento2attr.properties";
+	private final String solytron = "solytron.properties";
+	private final String stantek = "stantek.properties";
+	private final String magentoAttributes = "magento2attr.properties";
+	private final String magentoAttributesValues = "magento2laptopattributes.properties";
 	private final String solytronLaptop = "solytronLaptop.properties";
+	private final String solytronTablet = "solytronTablet.properties";
+	private final String solytronCategories = "solytronCategories.properties";
 	
 	@Bean
-	public Properties getSolytronLaptop(){
+	public HashMap<String, String> getSolytronLaptop(){
 		return load(solytronLaptop);
 	}
 	
 	@Bean
-	public Properties getSolytron(){
-		return load(solytronFile);
+	public HashMap<String, String> getSolytronCategories(){
+		return load(solytronCategories);
 	}
 	
 	@Bean
-	public Properties getStantek(){
-		return load(stantekFile);
+	public HashMap<String, String> getSolytronTablet(){
+		return load(solytronTablet);
 	}
 	
 	@Bean
-	public Properties getMagento(){
-		return load(magentoAttributesFile);
+	public HashMap<String, String> getSolytron(){
+		return load(solytron);
 	}
 	
-	private Properties load(String fileName){
+	@Bean
+	public HashMap<String, String> getStantek(){
+		return load(stantek);
+	}
+	
+	@Bean
+	public HashMap<String, String> getMagento(){
+		return load(magentoAttributes);
+	}
+	
+	@Bean
+	public HashMap<String, String> getMagentoAttributes(){
+		return load(magentoAttributesValues);
+	}
+	
+	private HashMap<String, String> load(String fileName){
 		Properties properties = new Properties();
 		
 		try {
@@ -49,6 +70,18 @@ public class PropertiesLoader {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return properties;
+		HashMap<String, String> propertiesMap = new HashMap<String, String>();
+		for(Entry<Object, Object> property : properties.entrySet()){
+			propertiesMap.put(String.valueOf(property.getKey()), String.valueOf(property.getValue()));
+		}
+		return propertiesMap;
+	}
+
+	public HashMap<String, String> getMagentoAttributesReversed() {
+		HashMap<String, String> propertiesMap = new HashMap<String, String>();
+		for(Entry<String, String> e : load(magentoAttributesValues).entrySet()){
+			propertiesMap.put(String.valueOf(e.getValue()), String.valueOf(e.getKey()));
+		}
+		return propertiesMap;
 	}
 }

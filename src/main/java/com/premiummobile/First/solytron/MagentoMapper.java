@@ -2,12 +2,12 @@ package com.premiummobile.First.solytron;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
@@ -16,34 +16,49 @@ import javax.imageio.ImageIO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.premiummobile.First.magento.KeyListAttribute;
-import com.premiummobile.First.magento.KeyValueAttribute;
 import com.premiummobile.First.magento.Attribute;
 import com.premiummobile.First.magento.ExtensionAttribute;
-import com.premiummobile.First.magento.MagentoProduct;
-import com.premiummobile.First.magento.MagentoStockItem;
+import com.premiummobile.First.magento.KeyListAttribute;
+import com.premiummobile.First.magento.KeyValueAttribute;
+import com.premiummobile.First.magento.MagentoProductRequest;
+import com.premiummobile.First.magento.MagentoStockItemFull;
+import com.premiummobile.First.magento.MagentoStockItemRequest;
+import com.premiummobile.First.magento.MediaGalleryContent;
 import com.premiummobile.First.magento.MediaGalleryEntry;
 import com.premiummobile.First.solytron.Model.Image;
 import com.premiummobile.First.solytron.Model.Property;
 import com.premiummobile.First.solytron.Model.SolytronProduct;
 import com.premiummobile.First.util.PropertiesLoader;
+import com.premiummobile.First.util.RequestsExecutor;
 	
 @Component
 public class MagentoMapper {
 	
 	PropertiesLoader loader;
 	
-	Properties solytronLaptopProperties;
+	HashMap<String, String> solytronLaptop;
+	
+	HashMap<String, String> magentoAttributes;
+	
+	HashMap<String, String> magentoAttributesReversed;
+	
+	RequestsExecutor requestsExecutor;
+	
+	MagentoLaptopHelper helper;
 	
 	@Autowired
-	public MagentoMapper(PropertiesLoader loader){
+	public MagentoMapper(PropertiesLoader loader, RequestsExecutor requestsExecutor, MagentoLaptopHelper helper){
+		this.requestsExecutor = requestsExecutor;
 		this.loader = loader;
-		this.solytronLaptopProperties = loader.getSolytronLaptop();
+		this.helper = helper;
+		this.solytronLaptop = loader.getSolytronLaptop();
+		this.magentoAttributes = loader.getMagentoAttributes();
+		this.magentoAttributesReversed = loader.getMagentoAttributesReversed();
 	}
 	
-	public MagentoProduct mapProduct(SolytronProduct product){
+	public MagentoProductRequest mapProduct(SolytronProduct product, String category){
 		
-		MagentoProduct magentoProduct = new MagentoProduct();
+		MagentoProductRequest magentoProduct = new MagentoProductRequest();
 		HashMap<Integer, String> properties = new HashMap<Integer, String>();
 		for(Property property : product.getProperties().get(1).getList()){
 			properties.put(property.getPropertyId(), property.getValue().get(0).getText());
@@ -68,610 +83,83 @@ public class MagentoMapper {
 		if(!magentoProduct.getName().toLowerCase().contains(product.getVendor().toLowerCase())){
 			magentoProduct.setName(product.getVendor() + " " + magentoProduct.getName());
 		}
-		magentoProduct.setVisibility(3);
 		magentoProduct.setTypeId("simple");
-		if(magentoProduct.getWeight() != null){
-			magentoProduct.setWeight(Double.valueOf(properties.get(48)));
-		}
-		MagentoStockItem magentoStockItem = new MagentoStockItem();
-		if(product.getStockInfoData() != null){
-			if(product.getStockInfoData().contains("OnHand")){
-				magentoStockItem.setInStock(true);
+		magentoProduct.setWeight(Double.valueOf(properties.get(48)));
+		
+		MagentoStockItemRequest magentoStockItem = new MagentoStockItemRequest();
+		if(product.getStockInfoValue() != null){
+			if(product.getStockInfoValue().contains("OnHand")){
+				magentoStockItem.setStock(true);
 				magentoStockItem.setQty(5);
 			}
-			else if(product.getStockInfoData().contains("Minimum")){
-				magentoStockItem.setInStock(true);
+			else if(product.getStockInfoValue().contains("Minimum")){
+				magentoStockItem.setStock(true);
 				magentoStockItem.setQty(2);
 			}
 			else{
-				magentoStockItem.setInStock(false);
+				magentoStockItem.setStock(false);
 				magentoStockItem.setQty(0);
 			}
 		}
-		magentoStockItem.setStockId(1);
-		magentoProduct.setExtensionAttributes(new ArrayList<ExtensionAttribute>());
-		magentoProduct.getExtensionAttributes().add(magentoStockItem);
-		magentoProduct.setCustomAttributes(generateAttributes(product.getProperties().get(1).getList()));
+		magentoProduct.setExtensionAttributes(new ExtensionAttribute());
+		magentoProduct.getExtensionAttributes().setItem(magentoStockItem);
+		
+		magentoProduct.setCustomAttributes(helper.generateAttributes(product.getProperties().get(1).getList()));
+		
+		KeyValueAttribute brand = new KeyValueAttribute();
+		brand.setAttributeCode("gsm_manufacturer");
+		brand.setValue(helper.generateBrand(product.getVendor()));
+		magentoProduct.getCustomAttributes().add(brand);
 		
 		KeyValueAttribute metaTitle = new KeyValueAttribute();
 		metaTitle.setAttributeCode("meta_title");
-		metaTitle.setValue(magentoProduct.getName() + " на топ цена и на изплащане от Примиъм Мобайл ЕООД - ревю, мнения, характеристики");
-		magentoProduct.getCustomAttributes().add(metaTitle);
 		
 		KeyValueAttribute metaDescription = new KeyValueAttribute();
 		metaDescription.setAttributeCode("meta_description");
-		metaDescription.setValue("Купете днес " + magentoProduct.getName() + " на изплащане с минимално оскъпяване и светкавично одобрение от PremiumMobile.bg. Бърза доставка на следващия ден и любезно обслужване.");
-		magentoProduct.getCustomAttributes().add(metaDescription);
 		
-		magentoProduct.getCustomAttributes().add(generateBrand(product.getVendor()));
-		int counter = 1;
-		List<MediaGalleryEntry> images = new ArrayList<MediaGalleryEntry>();
-		for(Image image : product.getImages()){
-			String imageName = magentoProduct.getSku() + counter + ".jpg";
-			try {
-				URL url = new URL(image.getText());
-		        BufferedImage img = ImageIO.read(url);
-		        File file = new File("c:\\images\\" + imageName);
-		        if(img == null || file == null) {
-		        	System.out.println("Image can't be downloaded");
-		        	continue;
-		        }
-		        MediaGalleryEntry entry = new MediaGalleryEntry();
-		        entry.setMediaType("image");
-		        entry.setDisabled(false);
-		        entry.setLabel(magentoProduct.getName() + " на топ цена и на изплащане от Примиъм Мобайл ЕООД");
-		        entry.setPosition(counter);
-		        if( counter == 1 ){
-		        	ArrayList<String> types = new ArrayList<String>();
-		        	types.add("image");
-		        	types.add("small_image");
-		        	types.add("thumbnail");
-		        	entry.setTypes(types);
-		        }
-		        ImageIO.write(img, "jpg", file);
-		        entry.setFileName("laptops/" + imageName);
-		        images.add(entry);
-			}
-			catch(IOException e){
-				System.out.println(e.getMessage());
-			}
+		KeyValueAttribute url = new KeyValueAttribute();
+		url.setAttributeCode("url_key");
 		
+		if(magentoProduct.getPrice() > 150){
+			metaTitle.setValue(magentoProduct.getName() + " на топ цена и на изплащане от Примиъм Мобайл ЕООД - ревю, мнения, характеристики");
+			metaDescription.setValue("Купете днес " + magentoProduct.getName() + " на изплащане и на супер цена с минимално оскъпяване и светкавично одобрение от PremiumMobile.bg. Бърза доставка на следващия ден и любезно обслужване.");
+			url.setValue(magentoProduct.getName() + "-cena-na-izplashtane");
 		}
-		magentoProduct.setMediaGalleryEntries(images);
+		else{
+			metaTitle.setValue(magentoProduct.getName() + " цена без конкуренция от Примиъм Мобайл ЕООД - ревю, мнения, характеристики");
+			metaDescription.setValue("Купете днес " + magentoProduct.getName() + " на страхотна цена с безплатна доставка от PremiumMobile.bg. Бърза доставка на следващия ден и любезно обслужване.");
+			url.setValue(magentoProduct.getName() + "-cena-za-balgaria");
+		}
+		magentoProduct.getCustomAttributes().add(url);
+		magentoProduct.getCustomAttributes().add(metaDescription);
+		magentoProduct.getCustomAttributes().add(metaTitle);
+		
+		KeyListAttribute categories = new KeyListAttribute();
+		categories.setAttributeCode("category_ids");
+		categories.setValues(generateCategories(category));
+		magentoProduct.getCustomAttributes().add(categories);
+
 		return magentoProduct;
 	}
 
-	private String generateShortDescription(String displaySize, String cpu, String ram, String hdd, String battery) {
-		StringBuilder st = new StringBuilder();
-		st.append("<ul class=\"short-description-list smartphone\"><div class=\"row\"><div class=\"col-md-2 col-md-offset-1\"><li class=\"display-size\">");
-		st.append(displaySize);
-		st.append("</li></div><div class=\"col-md-2\"><li class=\"processor\">");
-		st.append(cpu);
-		st.append("</li></div><div class=\"col-md-2\"><li class=\"memory\">");
-		st.append(ram);
-		st.append("</li></div><div class=\"col-md-2\"><li class=\"hdd\">");
-		st.append(hdd);
-		st.append("</li></div><div class=\"col-md-2\"><li class=\"battery\">");
-		st.append(battery);
-		st.append("</li></div></div></ul>");
-		return st.toString();
-	}
-
-	private List<Attribute> generateAttributes(List<Property> productProperties) {
-		HashMap<Integer, String> properties = new HashMap<Integer, String>();
-		for(Property property : productProperties){
-			properties.put(property.getPropertyId(), property.getValue().get(0).getText());
-		}
-		List<Attribute> customAttributes = new ArrayList<Attribute>();
-		
-		KeyListAttribute hddFilter = new KeyListAttribute();
-		hddFilter.setAttributeCode("hdd_razmer_filt_r_laptop");
-		hddFilter.setValues(new ArrayList<String>());
-		hddFilter.getValues().add(makeHddFilter(properties.get(11)));
-		customAttributes.add(hddFilter);
-		
-		KeyValueAttribute battery = new KeyValueAttribute();
-		battery.setAttributeCode("laptop_battery");
-		battery.setValue((properties.get(43) != null ? properties.remove(43) : "" + properties.get(44) != null ? " " + properties.remove(44) : ""));
-		customAttributes.add(battery);
-		
-		KeyListAttribute color = new KeyListAttribute();
-		color.setAttributeCode("laptop_color");
-		color.setValues(new ArrayList<String>());
-		color.getValues().add(generateColorFilter(properties.remove(71)));
-		customAttributes.add(color);
-		
-		KeyListAttribute cpuFilter = new KeyListAttribute();
-		cpuFilter.setAttributeCode("laptop_cpu_filter");
-		cpuFilter.setValues(new ArrayList<String>());
-		cpuFilter.getValues().add(generateCpuFilter(properties.remove(55), properties.get(2)));
-		customAttributes.add(cpuFilter);
-		
-		KeyValueAttribute dimensions = new KeyValueAttribute();
-		dimensions.setAttributeCode("laptop_dimensions");
-		dimensions.setValue(properties.remove(47));
-		customAttributes.add(dimensions);
-		
-		KeyValueAttribute displayInfo = new KeyValueAttribute();
-		displayInfo.setAttributeCode("laptop_display_info");
-		displayInfo.setValue((properties.get(1) + " " + properties.get(9)).trim());
-		customAttributes.add(displayInfo);
-		
-		KeyListAttribute displayResolution = new KeyListAttribute();
-		displayResolution.setAttributeCode("laptop_display_resolution");
-		displayResolution.setValues(new ArrayList<String>());
-		displayResolution.getValues().add(generateDisplayResolution(properties.get(1), properties.remove(70)).trim());
-		customAttributes.add(displayResolution);
-		
-		KeyListAttribute displaySize = new KeyListAttribute();
-		displaySize.setAttributeCode("laptop_display_size");
-		displaySize.setValues(new ArrayList<String>());
-		displaySize.getValues().add(generateDisplaySize(properties.remove(1)));
-		customAttributes.add(displaySize);
-		
-		KeyValueAttribute gpu = new KeyValueAttribute();
-		gpu.setAttributeCode("laptop_gpu");
-		gpu.setValue(properties.remove(10));
-		customAttributes.add(gpu);
-		
-		KeyValueAttribute hddInfo = new KeyValueAttribute();
-		hddInfo.setAttributeCode("laptop_hdd_info");
-		hddInfo.setValue(properties.get(11));
-		customAttributes.add(hddInfo);
-		
-		KeyValueAttribute hddSize = new KeyValueAttribute();
-		hddSize.setAttributeCode("laptop_hdd_size");
-		hddSize.setValue(generateHddSize(properties.get(11)));
-		customAttributes.add(hddSize);
-		
-		KeyValueAttribute optical = new KeyValueAttribute();
-		optical.setAttributeCode("laptop_optical");
-		optical.setValue(properties.remove(13));
-		customAttributes.add(optical);
-		
-		KeyListAttribute osFilter = new KeyListAttribute();
-		osFilter.setAttributeCode("laptop_os_filter");
-		osFilter.setValues(new ArrayList<String>());
-		osFilter.getValues().add(generateOsFilter(properties.remove(57)));
-		properties.remove(3);
-		customAttributes.add(osFilter);
-		
-		KeyValueAttribute processor = new KeyValueAttribute();
-		processor.setAttributeCode("laptop_processor");
-		processor.setValue(properties.remove(2));
-		customAttributes.add(processor);
-		
-		KeyListAttribute ram = new KeyListAttribute();
-		ram.setAttributeCode("laptop_ram");
-		ram.setValues(new ArrayList<String>());
-		ram.getValues().add(generateRamFilter(properties.remove(5)));
-		customAttributes.add(ram);
-		
-		KeyValueAttribute ramInfo = new KeyValueAttribute();
-		ramInfo.setAttributeCode("laptop_ram_info");
-		ramInfo.setValue(properties.remove(6));
-		customAttributes.add(ramInfo);
-		
-		KeyValueAttribute weight = new KeyValueAttribute();
-		weight.setAttributeCode("laptop_weight");
-		weight.setValue(properties.remove(48));
-		customAttributes.add(weight);
-		
-		KeyValueAttribute wifi = new KeyValueAttribute();
-		wifi.setAttributeCode("laptop_wifi");
-		wifi.setValue(properties.remove(15));
-		customAttributes.add(wifi);
-		
-		KeyValueAttribute warranty = new KeyValueAttribute();
-		warranty.setAttributeCode("laptop_warranty");
-		warranty.setValue(properties.remove(49));
-		customAttributes.add(warranty);
-		
-		KeyListAttribute yesNo = new KeyListAttribute();
-		yesNo.setAttributeCode("laptop_yes_no");
-		yesNo.setValues(generateYesNo(properties.remove(17),properties.remove(51),properties.remove(11), properties.remove(74), properties.remove(38),properties.remove(40),
-				properties.remove(59),properties.remove(28),properties.remove(62),properties.remove(52),properties.remove(22),properties.remove(9), properties.remove(69)));
-		customAttributes.add(yesNo);
-		
-		KeyValueAttribute ports = new KeyValueAttribute();
-		ports.setAttributeCode("laptop_ports");
-		StringBuilder portsString = new StringBuilder();
-
-		KeyValueAttribute otherInfo = new KeyValueAttribute();
-		otherInfo.setAttributeCode("laptop_other_info");
-		StringBuilder otherInfoString = new StringBuilder();
-		List<Property> productProperties2 = new ArrayList<Property>();
-		productProperties2.addAll(productProperties);
-		for(Property property : productProperties){
-			if(property.getPropertyId() == 18){
-				properties.remove(18);
-				portsString.append(property.getName() + ", ");
-				productProperties2.remove(property);
-				continue;
-			}
-			if(property.getPropertyId() == 29){
-				properties.remove(29);
-				portsString.append(property.getName() + ", ");
-				productProperties2.remove(property);
-				continue;
-			}
-			if(property.getPropertyId() == 41){
-				properties.remove(41);
-				portsString.append(property.getName() + ", ");
-				productProperties2.remove(property);
-				continue;
-			}
-			if(property.getPropertyId() == 42){
-				properties.remove(42);
-				portsString.append(property.getName() + ", ");
-				productProperties2.remove(property);
-				continue;
-			}
-			if(property.getPropertyId() == 53){
-				properties.remove(53);
-				portsString.append(property.getName() + ", ");
-				productProperties2.remove(property);
-				continue;
-			}
-			if(property.getPropertyId() == 61){
-				properties.remove(61);
-				portsString.append(property.getName() + ", ");
-				productProperties2.remove(property);
-				continue;
-			}
-			if(property.getPropertyId() == 62){
-				properties.remove(62);
-				portsString.append(property.getName() + ", ");
-				productProperties2.remove(property);
-				continue;
-			}
-			if(property.getPropertyId() == 24){
-				properties.remove(24);
-				portsString.append(property.getName() + ", ");
-				productProperties2.remove(property);
-				continue;
-			}
-			if(property.getPropertyId() == 28){
-				properties.remove(28);
-				portsString.append(property.getName() + ", ");
-				productProperties2.remove(property);
-				continue;
-			}
-			if(property.getPropertyId() == 29){
-				properties.remove(28);
-				portsString.append(property.getName() + ", ");
-				productProperties2.remove(property);
-				continue;
-			}
-		}
-		for(Property property : productProperties2){
-			if(properties.containsKey(property.getPropertyId())){
-				otherInfoString.append(property.getName() + ": " + property.getValue().get(0).getText());
-				if(properties.size() != 1){
-					otherInfoString.append("; ");
-				}
-			}
-		}
-		ports.setValue(portsString.toString());
-		customAttributes.add(ports);
-		otherInfo.setValue(otherInfoString.toString());
-		customAttributes.add(otherInfo);
-		
-		KeyValueAttribute shortDescription = new KeyValueAttribute();
-		shortDescription.setAttributeCode("short_description");
-		shortDescription.setValue(generateShortDescription(displaySize.getValues().get(0), cpuFilter.getValues().get(0), 
-				ram.getValues().get(0), hddSize.getValue(), battery.getValue()));
-		customAttributes.add(shortDescription);
-		
-		return customAttributes;
-	}
-	
-	private HashMap<Integer, String> generatePorts(HashMap<Integer, String> properties) {
+	private ArrayList<String> generateCategories(String category) {
+		ArrayList<String> categories = new ArrayList<String>();
+		categories.add("2");
+		categories.add("4");
+		categories.add("");
 		// TODO Auto-generated method stub
-		return null;
+		return categories;
 	}
 
-	private KeyListAttribute generateBrand(String brand){
-		KeyListAttribute attribute = new KeyListAttribute();
-		attribute.setAttributeCode("gsm_manufacturer");
-		attribute.setValues(new ArrayList<String>());
-		if(brand.contains("Lenovo") || brand.contains("LENOVO")){
-			attribute.getValues().add("Lenovo");
+	public List<String> downloadImages(SolytronProduct solytronProduct, MagentoProductRequest magentoProduct) throws Exception{
+		int counter = 1;
+		List<String> statuses = new ArrayList<String>();
+		for(Image image : solytronProduct.getImages()){
+			String status = requestsExecutor.uploadMagentoImage(magentoProduct, image.getText(), counter);
+			statuses.add(status);
+		    counter++;
 		}
-		if(brand.contains("Acer") || brand.contains("ACER")){
-			attribute.getValues().add("ACER");
-		}
-		if(brand.contains("HP") || brand.contains("Hewl")){
-			attribute.getValues().add("HP");
-		}
-		if(brand.contains("Dell") || brand.contains("DELL")){
-			attribute.getValues().add("DELL");
-		}
-		if(brand.contains("Asus") || brand.contains("ASUS")){
-			attribute.getValues().add("ASUS");
-		}
-		if(brand.contains("Apple") || brand.contains("APPLE")){
-			attribute.getValues().add("Apple");
-		}
-		return attribute;
-	}
-	private String generateHddSize(String string) {
-		StringBuilder st = new StringBuilder();
-		for(int i = 0; i < string.length(); i++){
-			if(string.charAt(i) == ' ' || string.charAt(i) == 'T' || string.charAt(i) == 'G'){
-				break;
-			}
-			st.append(string.charAt(i));
-		}
-		int gb = Integer.parseInt(st.toString());
-		
-		if(gb <= 5){
-			return gb + " TB";
-		}
-		else{
-			return gb + " GB";
-		}
-	}
-
-	private String generateOsFilter(String string) {
-		if(string != null && !string.equals("")){
-			if(string.contains("indows")){
-				return "Windows";
-			}
-			if(string.contains("DOS") || string.contains("No OS")){
-				return "DOS";
-			}
-			if(string.contains("Mac")){
-				return "Mac OS";
-			}
-			if(string.contains("inux")){
-				return "Linux";
-			}
-		}
-		return "DOS";
-	}
-	
-	private String generateRamFilter(String memory){
-		if(memory != null && !memory.equals("")){
-			memory = memory.trim();
-			StringBuilder st = new StringBuilder();
-			for(int i = 0; i < memory.length(); i++) {
-				if(memory.charAt(i) == ' ' || memory.charAt(i) == 'G') {
-					break;
-				}
-				if(memory.charAt(i) == 'x'){
-					String multiplyier = String.valueOf(memory.charAt(i-1));
-					String ram = new String();
-					for(int j = i + 1; j < memory.length(); j++) {
-						if(memory.charAt(j) > 57 || memory.charAt(j) < 48){
-							break;
-						}
-						ram = ram + memory.charAt(j);
-					}
-					return Integer.valueOf(multiplyier)*Integer.valueOf(ram) + " GB";
-				}
-				st.append(memory.charAt(i));
-			}
-			return st.toString() + " GB";
-		}
-		return "4 GB";
-	}
-
-	private String generateColorFilter(String color) {
-		if(color != null && !color.equals("")){
-			if(Pattern.compile(Pattern.quote("black"), Pattern.CASE_INSENSITIVE).matcher(color).find()){
-				return "Черен";
-			}
-			if(Pattern.compile(Pattern.quote("черен"), Pattern.CASE_INSENSITIVE).matcher(color).find()){
-				return "Черен";
-			}
-			if(Pattern.compile(Pattern.quote("blue"), Pattern.CASE_INSENSITIVE).matcher(color).find()){
-				return "Син";
-			}
-			if(Pattern.compile(Pattern.quote("red"), Pattern.CASE_INSENSITIVE).matcher(color).find()){
-				return "Червен";
-			}
-			if(Pattern.compile(Pattern.quote("white"), Pattern.CASE_INSENSITIVE).matcher(color).find()){
-				return "Бял";
-			}
-			if(Pattern.compile(Pattern.quote("gray"), Pattern.CASE_INSENSITIVE).matcher(color).find()){
-				return "Сив";
-			}
-			if(Pattern.compile(Pattern.quote("grey"), Pattern.CASE_INSENSITIVE).matcher(color).find()){
-				return "Сив";
-			}
-			if(Pattern.compile(Pattern.quote("silver"), Pattern.CASE_INSENSITIVE).matcher(color).find()){
-				return "Сребрист";
-			}
-			if(Pattern.compile(Pattern.quote("gold"), Pattern.CASE_INSENSITIVE).matcher(color).find()){
-				return "Златист";
-			}
-			if(Pattern.compile(Pattern.quote("purple"), Pattern.CASE_INSENSITIVE).matcher(color).find()){
-				return "Лилав";
-			}
-		}
-		return "Черен";
-	}
-
-	private String generateCpuFilter(String cpuFilter, String cpuFilter2) {
-		if(cpuFilter == null || cpuFilter.equals("")){
-			cpuFilter = cpuFilter2;
-		}
-		if(cpuFilter.contains("i7")){
-			return "Intel Core i7";
-		}
-		if(cpuFilter.contains("i5")){
-			return "Intel Core i5";
-		}
-		if(cpuFilter.contains("i3")){
-			return "Intel Core i3";
-		}
-		if(cpuFilter.contains("entium")){
-			return "Intel Pentium";
-		}
-		if(cpuFilter.contains("AMD")){
-			return "AMD";
-		}
-		if(cpuFilter.contains("eleron")){
-			return "Intel Celeron";
-		}
-		if(cpuFilter.contains("eon")){
-			return "Intel Xeon";
-		}
-		if(cpuFilter.contains("tom")){
-			return "Intel Atom";
-		}
-		return "Intel Core i3";
-	}
-
-	private List<String> generateYesNo(String bluetooth, String camera, String ssd, String ssd2, String reader, String fingerprint, String hdmi, 
-			String hdmi2, String onelink, String usb3, String rj45, String sensorscreen, String usbc){
-		List<String> list = new ArrayList<String>();
-		if(bluetooth != null && !bluetooth.contains("No")){
-			list.add("Bluetooth");
-		}
-		if(camera != null && !camera.contains("No")){
-			list.add("Камера");
-		}
-		if(ssd != null && (ssd.contains("SSD") || ssd.contains("ssd") || ssd.contains("Ssd"))){
-			list.add("SSD");
-		}
-		else if(ssd2 != null && (ssd2.contains("SSD") || ssd2.contains("ssd") || ssd2.contains("Ssd"))){
-			list.add("SSD");
-		}
-		if(reader != null && !reader.contains("No")){
-			list.add("Четец за карти");
-		}
-		if(fingerprint != null && !fingerprint.contains("No")){
-			list.add("Сензор за отпечатък");
-		}
-		if(hdmi != null && !hdmi.contains("No")){
-			list.add("HDMI порт");
-		}
-		else if(hdmi2 != null && !hdmi2.contains("No")){
-			list.add("HDMI порт");
-		}
-		if(onelink != null && !onelink.contains("No")){
-			list.add("OneLink порт");
-		}
-		if(usb3 != null && !usb3.equals("")){
-			list.add("USB 3.0");
-		}
-		if(rj45 != null && !rj45.contains("No")){
-			list.add("RJ-45 порт");
-		}
-		if(sensorscreen != null && sensorscreen.contains("ouch")){
-			list.add("Сензорен екран");
-		}
-		if(usbc != null){
-			if(Integer.valueOf(usbc) > 0){
-				list.add("USB Type C");
-			}
-		}
-		return list;
-	}
-	private String generateDisplaySize(String string) {
-		if(string != null && !string.equals("")){
-			if(string.contains("15.6")){
-				return "15.6 inch (39.62 cm)";
-			}
-			if(string.contains("14")){
-				return "14.0 inch (35.56 cm)";
-			}
-			if(string.contains("17")){
-				return "17.3 inch (43.94 cm)";
-			}
-			if(string.contains("12.0")){
-				return "12.0 inch (30.48 cm)";
-			}
-			if(string.contains("13.3")){
-				return "13.3 inch (33.78 cm)";
-			}
-			if(string.contains("13.0")){
-				return "13.0 inch (33.02 cm)";
-			}
-			if(string.contains("11.6")){
-				return "11.6 inch (29.46 cm)";
-			}
-			if(string.contains("15.4")){
-				return "15.4 inch (39.12 cm)";
-			}
-			return "15.6 inch (39.62 cm)";
-		}
-		return null;
-	}
-
-	private String generateDisplayResolution(String string, String string1) {
-		String string2 = string1 != null && !string1.equals("") ? string1 : string;
-		if(string2 != null && !string2.equals("")){
-			if(string2.contains("1366") && string2.contains("768")){
-				return "1366x768";
-			}
-			if(string2.contains("1280") && string2.contains("720")){
-				return "HD (1280x720)";
-			}
-			if(string2.contains("1600") && string2.contains("1080")){
-				return "HD+ (1600x1080)";
-			}
-			if(string2.contains("1920") && string2.contains("1080")){
-				return "Full HD (1920x1080)";
-			}
-			if(string2.contains("2560") && string2.contains("1440")){
-				return "Quad HD (2560x1440)";
-			}
-			if(string2.contains("3200") && string2.contains("1800")){
-				return "Quad HD+ (3200x1800)";
-			}
-			if(string2.contains("3640") && string2.contains("2160")){
-				return "Ultra HD - 4K (3640x2160)";
-			}
-			if(string2.contains("2304") && string2.contains("1440")){
-				return "Retina (2304x1440)";
-			}
-			if(string2.contains("2880") && string2.contains("1800")){
-				return "Retina (2880x1800)";
-			}
-		}
-		return "1366x768";
-	}
-
-	private String makeHddFilter(String string) {
-		StringBuilder st = new StringBuilder();
-		for(int i = 0; i < string.length(); i++){
-			if(string.charAt(i) == ' ' || string.charAt(i) == 'T' || string.charAt(i) == 'G'){
-				break;
-			}
-			st.append(string.charAt(i));
-		}
-		int gb = Integer.parseInt(st.toString());
-		if(gb <= 200){
-			if(gb <= 5){
-				return "1001-1500 GB";
-			}
-			else{
-				return "под 200 GB";
-			}
-		}
-		if(gb > 200 && gb <= 400){
-			return "200-400 GB";
-		}
-		if(gb > 400 && gb <= 600){
-			return "401-600 GB";
-			
-		}
-		if(gb > 600 && gb <= 800){
-			return "601-800 GB";
-		}
-		if(gb > 800 && gb <= 1000){
-			return "801-1000 GB";
-		}
-		if(gb > 1000 && gb <= 1500){
-			return "1001-1500 GB";
-		}
-		if(gb > 1500){
-			return "над 1500 GB";
-		}
-		return "401-600 GB";
+		return statuses;
 	}
 
 	private String trimName(String name) {
@@ -687,7 +175,7 @@ public class MagentoMapper {
 		name = name.trim();
 		int spaces = 0;
 		for(int i = 0; i < name.length(); i++){
-			if(name.charAt(i) == ',' || name.charAt(i) == ';' || name.charAt(i) == (char) 047 ){
+			if(name.charAt(i) == ',' || name.charAt(i) == ';' || name.charAt(i) == (char) 047 || name.charAt(i) == '/'){
 				break;
 			}
 			if(name.charAt(i) == ' '){

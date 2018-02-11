@@ -5,13 +5,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class MagentoPostProduct {
 	
 	@JsonProperty("product")
-	private MagentoProduct magentoProduct;
+	private MagentoProductRequest magentoProduct;
 
-	public MagentoProduct getMagentoProduct() {
+	public MagentoProductRequest getMagentoProduct() {
 		return magentoProduct;
 	}
 
-	public void setMagentoProduct(MagentoProduct magentoProduct) {
+	public void setMagentoProduct(MagentoProductRequest magentoProduct) {
 		this.magentoProduct = magentoProduct;
 	}
 	

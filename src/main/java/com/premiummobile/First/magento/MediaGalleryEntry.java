@@ -2,16 +2,40 @@ package com.premiummobile.First.magento;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreType;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
+@JsonInclude(Include.NON_NULL)
 public class MediaGalleryEntry {
-
+	
+	@JsonIgnore
 	private int id;
+	@JsonProperty("media_type")
 	private String mediaType;
+	@JsonProperty("label")
 	private String label;
+	@JsonProperty("position")
 	private int position;
+	@JsonProperty("disabled")
 	private boolean disabled;
+	@JsonProperty("types")
 	private List<String> types;
+	@JsonProperty("file")
 	private String fileName;
+	@JsonProperty("content")
+	private MediaGalleryContent content;
 
+	public MediaGalleryContent getContent() {
+		return content;
+	}
+
+	public void setContent(MediaGalleryContent content) {
+		this.content = content;
+	}
+	@JsonIgnore
 	public int getId() {
 		return id;
 	}

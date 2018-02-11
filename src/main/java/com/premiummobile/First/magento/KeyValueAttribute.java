@@ -16,6 +16,9 @@ public class KeyValueAttribute extends Attribute{
 		this.attributeCode = attributeCode;
 	}
 	public String getValue() {
+		if(value == null){
+			return "";
+		}
 		return value;
 	}
 	public void setValue(String value) {
