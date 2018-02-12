@@ -15,7 +15,7 @@ import com.premiummobile.First.solytron.Model.Property;
 import com.premiummobile.First.util.PropertiesLoader;
 
 @Component
-public class MagentoLaptopHelper {
+public class MagentoMappingHelper {
 	
 PropertiesLoader loader;
 	
@@ -28,7 +28,7 @@ PropertiesLoader loader;
 	
 	
 	@Autowired
-	public MagentoLaptopHelper(PropertiesLoader loader){
+	public MagentoMappingHelper(PropertiesLoader loader){
 		this.loader = loader;
 		this.solytronLaptop = loader.getSolytronLaptop();
 		this.magentoAttributes = loader.getMagentoAttributes();
@@ -51,7 +51,7 @@ PropertiesLoader loader;
 		return st.toString();
 	}
 
-	public List<Attribute> generateAttributes(List<Property> productProperties) {
+	public List<Attribute> generateLaptopAttributes(List<Property> productProperties) {
 		HashMap<Integer, String> properties = new HashMap<Integer, String>();
 		for(Property property : productProperties){
 			properties.put(property.getPropertyId(), property.getValue().get(0).getText());
@@ -282,7 +282,7 @@ PropertiesLoader loader;
 		if(brand.contains("Toshiba") || brand.contains("TOSHIBA")){
 			return magentoAttributesReversed.get("Toshiba");
 		}
-		return magentoAttributesReversed.get("Acer");
+		return magentoAttributesReversed.get("Други");
 	}
 	
 	private String generateHddSize(String string) {
@@ -380,7 +380,7 @@ PropertiesLoader loader;
 				return magentoAttributesReversed.get("Лилав");
 			}
 		}
-		return "Черен";
+		return magentoAttributesReversed.get("Черен");
 	}
 
 	private String generateCpuFilter(String cpuFilter, String cpuFilter2) {
@@ -566,5 +566,25 @@ PropertiesLoader loader;
 			return magentoAttributesReversed.get("над 1500 GB");
 		}
 		return magentoAttributesReversed.get("401-600 GB");
+	}
+
+	public List<Attribute> generateSimpleAttributes(List<Property> list) {
+		KeyValueAttribute description = new KeyValueAttribute();
+		description.setAttributeCode("description");
+		StringBuilder st = new StringBuilder();
+		st.append("<h4>");
+		for(Property property : list){
+			st.append(property.getName() + ": " + property.getValue().get(0).getText() + "<br>");
+		}
+		st.append("</h4>");
+		ArrayList<Attribute> attributes = new ArrayList<Attribute>();
+		description.setValue(st.toString());
+		attributes.add(description);
+		return attributes;
+	}
+
+	public List<Attribute> generateTabletAttributes(List<Property> list) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

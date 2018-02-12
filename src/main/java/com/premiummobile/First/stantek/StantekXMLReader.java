@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Properties;
+import java.util.HashMap;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -32,9 +32,9 @@ public class StantekXMLReader {
 	public String readXML(){
 		
 		URL url = null;
-		Properties stantek = propertiesLoad.getStantek();
+		HashMap<String, String> stantekProperties = propertiesLoad.getStantek();
 		try {
-			url = new URL(stantek.getProperty("url"));
+			url = new URL(stantekProperties.get("url"));
 		} catch (MalformedURLException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -57,12 +57,12 @@ public class StantekXMLReader {
 		doc.getDocumentElement().normalize();
 		System.out.println("Root element :" + doc.getDocumentElement().getNodeName());
 		NodeList nList = doc.getElementsByTagName("Product");
-		String laptop = stantek.getProperty("laptopCategory");
-		String tablet = stantek.getProperty("tabletCategory");
-		String gsmAcc = stantek.getProperty("gsmAccessoriesCategory");
-		String gsmDis = stantek.getProperty("gsmDisplayCategory");
-		String gsmBat = stantek.getProperty("gsmBatteryCategory");
-		String gsmPar = stantek.getProperty("gsmPartsCategory");
+		String laptop = stantekProperties.get("laptopCategory");
+		String tablet = stantekProperties.get("tabletCategory");
+		String gsmAcc = stantekProperties.get("gsmAccessoriesCategory");
+		String gsmDis = stantekProperties.get("gsmDisplayCategory");
+		String gsmBat = stantekProperties.get("gsmBatteryCategory");
+		String gsmPar = stantekProperties.get("gsmPartsCategory");
 		ArrayList laptops = new ArrayList();
 		ArrayList tablets = new ArrayList();
 		ArrayList gsmAccessories = new ArrayList();

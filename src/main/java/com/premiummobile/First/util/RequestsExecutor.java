@@ -1,6 +1,5 @@
 package com.premiummobile.First.util;
 
-import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.net.URL;
@@ -9,7 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Properties;
 import java.util.TreeMap;
 
 import javax.imageio.ImageIO;
@@ -50,6 +48,7 @@ import com.premiummobile.First.magento.MediaGalleryEntryWrapper;
 import com.premiummobile.First.magento.Option;
 import com.premiummobile.First.magento.ProductLink;
 import com.premiummobile.First.magento.TierPrice;
+import com.premiummobile.First.solytron.Model.Category;
 import com.premiummobile.First.solytron.Model.ProductSet;
 import com.premiummobile.First.solytron.Model.SolytronProduct;
 	
@@ -175,7 +174,7 @@ public class RequestsExecutor {
 		httpPost.addHeader("Content-Type", "application/json");
 		httpPost.setEntity(params);
 		CloseableHttpResponse response = client.execute(httpPost);
-//		System.out.println("Product response: " + EntityUtils.toString(response.getEntity(), "UTF-8"));
+		System.out.println("Product response: " + EntityUtils.toString(response.getEntity(), "UTF-8"));
 		System.err.println("Product status: " + response.getStatusLine().getStatusCode());
 		response.close();
 		client.close();
@@ -189,12 +188,11 @@ public class RequestsExecutor {
 		initial.setPrice(product.getPrice());
 		initial.setStatus(1);
 		initial.setVisibility(4);
-		initial.setAttributeSetId(10);
 		initial.setOptions(new ArrayList<Option>());
 		initial.setTypeId("simple");
 		initial.setExtensionAttributes(new ExtensionAttribute());
 		initial.setProductLinks(new ArrayList<ProductLink>());
-		initial.setMediaGalleryEntries(new ArrayList<MediaGalleryEntry>());
+//		initial.setMediaGalleryEntries(new ArrayList<MediaGalleryEntry>());
 		initial.setTierPrices(new ArrayList<TierPrice>());
 		initial.setCustomAttributes(new ArrayList<Attribute>());
 		return initial;
@@ -256,17 +254,19 @@ public class RequestsExecutor {
 			for(MagentoAttribute attribute : itemResponse.getAttributes()){
 				attributes.put(attribute.getId(), attribute.getName());
 				if(attribute.getOptions().size() > 0){
+					System.out.println(attribute.getName());
 					for(Option option : attribute.getOptions()){
 						options.put(option.getValue(), option.getLabel());
+						System.out.println(option.getValue() + "=" + option.getLabel());
 					}
 				}
 			}
-			for(Entry<Integer,String> entry : attributes.entrySet()){
-				System.out.println(entry.getKey() + "=" + entry.getValue());
-			}
-			for(Entry<String, String> entry : options.entrySet()){
-				System.out.println(entry.getKey() + "=" + entry.getValue());
-			}
+//			for(Entry<Integer,String> entry : attributes.entrySet()){
+//				System.out.println(entry.getKey() + "=" + entry.getValue());
+//			}
+//			for(Entry<String, String> entry : options.entrySet()){
+//				System.out.println(entry.getKey() + "=" + entry.getValue());
+//			}
         }
 		
 		return null;
@@ -337,5 +337,52 @@ public class RequestsExecutor {
 		response.close();
 		client.close();
 		return statusResponse;
+	}
+
+	public List<String> downloadMagentoCategories() throws Exception{
+		URIBuilder builder = new URIBuilder();
+		builder.setScheme("http").setHost(magentoProperties.get("host"));
+		builder.setPath(magentoProperties.get("categories"));
+		HttpGet httpGet = new HttpGet(builder.build());
+		httpGet.addHeader("Authorization", "Bearer " + magentoToken);
+		httpGet.addHeader("Content-Type", "application/json");
+		CloseableHttpResponse response = this.getClient().execute(httpGet);
+		Category category = new Category();
+		if (response.getEntity() != null) {
+			category = om.readValue(EntityUtils.toString(response.getEntity()), Category.class);
+        }
+		
+		return walkCategories(category);
+	}
+
+	private List<String> walkCategories(Category category) {
+		List<String> result = new ArrayList<String>();
+		System.out.println(category.getName() + "=" + category.getId());
+		result.add(category.getName() + "=" + category.getId());
+		String categoryName = "";
+		for(Category categoryInner : category.getChildrenData()){
+			if(categoryInner.getName().equals("Смартфони")){
+				categoryName = "Smartphone";
+			}
+			if(categoryInner.getName().equals("Лаптопи")){
+				categoryName = "Laptops";
+			}
+			if(categoryInner.getName().equals("Таблети")){
+				categoryName = "Tablets";
+			}
+			if(categoryInner.getName().equals("Аксесоари")){
+				categoryName = "Accessory";
+			}
+			if(categoryInner.getName().equals("Дронове")){
+				categoryName = "Drones";
+			}
+			System.out.println(categoryName + "=" + categoryInner.getId());
+			result.add(categoryName + "=" + categoryInner.getId());
+			for(Category categoryInnerInner : categoryInner.getChildrenData()){
+				System.out.println(categoryName + categoryInnerInner.getName() + "=" + categoryInnerInner.getId());
+				result.add(categoryName + categoryInnerInner.getName() + "=" + categoryInnerInner.getId());
+			}
+		}
+		return result;
 	}
 }

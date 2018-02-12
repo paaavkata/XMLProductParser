@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
@@ -19,7 +18,8 @@ public class PropertiesLoader {
 	private final String solytron = "solytron.properties";
 	private final String stantek = "stantek.properties";
 	private final String magentoAttributes = "magento2attr.properties";
-	private final String magentoAttributesValues = "magento2laptopattributes.properties";
+	private final String magentoCategories = "magento2categories.properties";
+	private final String magentoAttributesValues = "magento2laptop.properties";
 	private final String solytronLaptop = "solytronLaptop.properties";
 	private final String solytronTablet = "solytronTablet.properties";
 	private final String solytronCategories = "solytronCategories.properties";
@@ -57,6 +57,11 @@ public class PropertiesLoader {
 	@Bean
 	public HashMap<String, String> getMagentoAttributes(){
 		return load(magentoAttributesValues);
+	}
+	
+	@Bean
+	public HashMap<String, String> getMagentoCategories(){
+		return load(magentoCategories);
 	}
 	
 	private HashMap<String, String> load(String fileName){

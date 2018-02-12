@@ -26,7 +26,7 @@ public class StantekLaptopsBuilder {
 //	
 	public String parseXML(ArrayList<Element> products) {
 		String result = new String();
-		final Properties stantekProperties = propertiesLoader.getStantek();
+		HashMap<String, String> stantekProperties = propertiesLoader.getStantek();
 		try {
 			HashSet<Laptop> laptops = new HashSet<Laptop>();
 			for (Element e : products) {
@@ -40,11 +40,11 @@ public class StantekLaptopsBuilder {
 				laptop.setPrice(clientPrice);
 				StringBuilder st = new StringBuilder();
 				StringBuilder st1 = new StringBuilder();
-				if(values.containsKey(stantekProperties.getProperty("partitionN"))){
-					laptop.setSku(values.remove(stantekProperties.getProperty("partitionN")));
+				if(values.containsKey(stantekProperties.get("partitionN"))){
+					laptop.setSku(values.remove(stantekProperties.get("partitionN")));
 				}
-				if(values.containsKey(stantekProperties.getProperty("partN")) && laptop.getSku() == null){
-					laptop.setSku(values.remove(stantekProperties.getProperty("partN")));
+				if(values.containsKey(stantekProperties.get("partN")) && laptop.getSku() == null){
+					laptop.setSku(values.remove(stantekProperties.get("partN")));
 				}
 				
 				if(laptop.getSku() == null){
@@ -136,58 +136,58 @@ public class StantekLaptopsBuilder {
 				
 				laptop.setQty(5);
 				//WEIGHT
-				if(values.containsKey(stantekProperties.getProperty("weight"))){
-					laptop.setWeight(values.remove(stantekProperties.getProperty("weight")));
+				if(values.containsKey(stantekProperties.get("weight"))){
+					laptop.setWeight(values.remove(stantekProperties.get("weight")));
 				}
-				if(values.containsKey(stantekProperties.getProperty("weight2")) && laptop.getWeight() == null){
-					laptop.setWeight(values.remove(stantekProperties.getProperty("weight2")));
+				if(values.containsKey(stantekProperties.get("weight2")) && laptop.getWeight() == null){
+					laptop.setWeight(values.remove(stantekProperties.get("weight2")));
 				}
 				if(laptop.getWeight().equals("")){
 					laptop.setWeight("2");
 				}
 				//BATTERY
 				String temp = new String();
-				if(values.containsKey(stantekProperties.getProperty("battery"))){
-					temp = values.remove(stantekProperties.getProperty("battery").trim());
+				if(values.containsKey(stantekProperties.get("battery"))){
+					temp = values.remove(stantekProperties.get("battery").trim());
 				}
-				if(values.containsKey(stantekProperties.getProperty("battery2"))){
-					temp = temp + " " + values.remove(stantekProperties.getProperty("battery2"));
+				if(values.containsKey(stantekProperties.get("battery2"))){
+					temp = temp + " " + values.remove(stantekProperties.get("battery2"));
 				}
-				if(values.containsKey(stantekProperties.getProperty("batteryCell"))){
-					temp = temp + " " +  values.remove(stantekProperties.getProperty("batteryCell"));
+				if(values.containsKey(stantekProperties.get("batteryCell"))){
+					temp = temp + " " +  values.remove(stantekProperties.get("batteryCell"));
 				}
-				if(values.containsKey(stantekProperties.getProperty("batteryLife"))){
-					temp = temp + " " +  values.remove(stantekProperties.getProperty("batteryLife"));
+				if(values.containsKey(stantekProperties.get("batteryLife"))){
+					temp = temp + " " +  values.remove(stantekProperties.get("batteryLife"));
 				}
-				if(values.containsKey(stantekProperties.getProperty("batteryLife2"))){
-					temp = temp + " " +  values.remove(stantekProperties.getProperty("batteryLife2"));
+				if(values.containsKey(stantekProperties.get("batteryLife2"))){
+					temp = temp + " " +  values.remove(stantekProperties.get("batteryLife2"));
 				}
 				laptop.setBattery(temp.trim());
 				//AUDIO AND SOUND
-				if(values.containsKey(stantekProperties.getProperty("audio"))){
-					laptop.setAudio(values.remove(stantekProperties.getProperty("audio")));
+				if(values.containsKey(stantekProperties.get("audio"))){
+					laptop.setAudio(values.remove(stantekProperties.get("audio")));
 				}
-				if(values.containsKey(stantekProperties.getProperty("sound")) && laptop.getAudio().equals("")){
-					laptop.setAudio(values.remove(stantekProperties.getProperty("sound")));
+				if(values.containsKey(stantekProperties.get("sound")) && laptop.getAudio().equals("")){
+					laptop.setAudio(values.remove(stantekProperties.get("sound")));
 				}
 				if(laptop.getAudio().equals("")){
 					laptop.setAudio("Audio Combo Jack");
 				}
 				//CONNECTIVITY
 				temp = new String();
-				if(values.containsKey(stantekProperties.getProperty("3g"))){
-					temp = "3G:" + values.remove(stantekProperties.getProperty("3g"));
+				if(values.containsKey(stantekProperties.get("3g"))){
+					temp = "3G:" + values.remove(stantekProperties.get("3g"));
 				}
-				if(values.containsKey(stantekProperties.getProperty("4g"))){
-					temp = temp + " 4G:" + values.remove(stantekProperties.getProperty("4g"));
+				if(values.containsKey(stantekProperties.get("4g"))){
+					temp = temp + " 4G:" + values.remove(stantekProperties.get("4g"));
 				}
-				if(values.containsKey(stantekProperties.getProperty("4glte"))){
-					temp = temp + " 4G/LTE:" +  values.remove(stantekProperties.getProperty("4glte"));
+				if(values.containsKey(stantekProperties.get("4glte"))){
+					temp = temp + " 4G/LTE:" +  values.remove(stantekProperties.get("4glte"));
 				}
 				laptop.setConnectivity(temp);
 				//YES/NO FILTERS
 				temp = new String();
-				temp = values.remove(stantekProperties.getProperty("bluetooth"));
+				temp = values.remove(stantekProperties.get("bluetooth"));
 				if(temp != null){
 					if(temp.toLowerCase().contains("no") || temp.toLowerCase().contains("не")){
 						laptop.setBluetooth(false);
@@ -197,7 +197,7 @@ public class StantekLaptopsBuilder {
 					}
 				}
 				temp = new String();
-				temp = values.remove(stantekProperties.getProperty("integratedBluetooth"));
+				temp = values.remove(stantekProperties.get("integratedBluetooth"));
 				if(temp != null && !laptop.getBluetooth()){
 					if(temp.toLowerCase().contains("no") || temp.toLowerCase().contains("не")){
 						laptop.setBluetooth(false);
@@ -207,7 +207,7 @@ public class StantekLaptopsBuilder {
 					}
 				}
 				temp = new String();
-				temp = values.remove(stantekProperties.getProperty("camera2"));
+				temp = values.remove(stantekProperties.get("camera2"));
 				if(temp != null){
 					if(temp.toLowerCase().contains("no") || temp.toLowerCase().contains("не")){
 						laptop.setWebcam(false);
@@ -217,7 +217,7 @@ public class StantekLaptopsBuilder {
 					}
 				}
 				temp = new String();
-				temp = values.remove(stantekProperties.getProperty("integratedCamera"));
+				temp = values.remove(stantekProperties.get("integratedCamera"));
 				if(temp != null && !laptop.isWebcam()){
 					if(temp.toLowerCase().contains("no") || temp.toLowerCase().contains("не")){
 						laptop.setWebcam(false);
@@ -227,7 +227,7 @@ public class StantekLaptopsBuilder {
 					}
 				}
 				temp = new String();
-				temp = values.remove(stantekProperties.getProperty("cardReader")) + values.remove(stantekProperties.getProperty("cardReader2"));
+				temp = values.remove(stantekProperties.get("cardReader")) + values.remove(stantekProperties.get("cardReader2"));
 				if(temp != null){
 					if(temp.toLowerCase().contains("no") || temp.toLowerCase().contains("не")){
 						laptop.setCardReader(false);
@@ -237,7 +237,7 @@ public class StantekLaptopsBuilder {
 					}
 				}
 				temp = new String();
-				temp = values.remove(stantekProperties.getProperty("usb3"));
+				temp = values.remove(stantekProperties.get("usb3"));
 				if(temp != null){
 					laptop.setUsb3(true);
 				}
@@ -245,7 +245,7 @@ public class StantekLaptopsBuilder {
 					laptop.setUsb3(false);
 				}
 				temp = new String();
-				temp = values.remove(stantekProperties.getProperty("sensorScreen"));
+				temp = values.remove(stantekProperties.get("sensorScreen"));
 				if(temp != null){
 					laptop.setSensorScreen(true);
 				}
@@ -253,7 +253,7 @@ public class StantekLaptopsBuilder {
 					laptop.setSensorScreen(false);
 				}
 				temp = new String();
-				temp = values.remove(stantekProperties.getProperty("keyboard"));
+				temp = values.remove(stantekProperties.get("keyboard"));
 				if(temp != null && temp.contains("acklit")){
 					laptop.setKeyboardBacklit(true);
 				}
@@ -261,7 +261,7 @@ public class StantekLaptopsBuilder {
 					laptop.setKeyboardBacklit(false);
 				}
 				temp = new String();
-				temp = values.get(stantekProperties.getProperty("rj45"));
+				temp = values.get(stantekProperties.get("rj45"));
 				if(temp != null && temp.contains("es")){
 					laptop.setRj45(true);
 				}
@@ -269,7 +269,7 @@ public class StantekLaptopsBuilder {
 					laptop.setRj45(false);
 				}
 				temp = new String();
-				temp = values.get(stantekProperties.getProperty("oneLink"));
+				temp = values.get(stantekProperties.get("oneLink"));
 				if(temp != null && temp.contains("es")){
 					laptop.setOneLink(true);
 				}
@@ -277,13 +277,13 @@ public class StantekLaptopsBuilder {
 					laptop.setOneLink(false);
 				}
 				temp = new String();
-				temp = values.get(stantekProperties.getProperty("fingerPrint"));
+				temp = values.get(stantekProperties.get("fingerPrint"));
 				if(temp != null && temp.contains("es")){
 					laptop.setFingerPrint(true);
 				}
 				else{
 					temp = new String();
-					temp = values.get(stantekProperties.getProperty("fingerPrint2"));
+					temp = values.get(stantekProperties.get("fingerPrint2"));
 					if(temp != null && temp.contains("es")){
 						laptop.setFingerPrint(true);
 					}
@@ -292,7 +292,7 @@ public class StantekLaptopsBuilder {
 					}
 				}
 				temp = new String();
-				temp = values.get(stantekProperties.getProperty("hddType"));
+				temp = values.get(stantekProperties.get("hddType"));
 				if(temp != null && temp.contains("SSD")){
 					laptop.setSsd(true);
 				}
@@ -300,51 +300,51 @@ public class StantekLaptopsBuilder {
 					laptop.setSsd(false);
 				}
 				//COLOR
-				laptop.setColor(values.remove(stantekProperties.getProperty("color")));
+				laptop.setColor(values.remove(stantekProperties.get("color")));
 				//CPU AND FILTER
-				if(values.containsKey(stantekProperties.getProperty("cpu2"))){
-					laptop.setCpu(values.remove(stantekProperties.getProperty("cpu2")));
+				if(values.containsKey(stantekProperties.get("cpu2"))){
+					laptop.setCpu(values.remove(stantekProperties.get("cpu2")));
 				}
-				if(values.containsKey(stantekProperties.getProperty("cpuName")) && laptop.getCpu() == null){
-					laptop.setCpu(values.remove(stantekProperties.getProperty("cpuName")));
+				if(values.containsKey(stantekProperties.get("cpuName")) && laptop.getCpu() == null){
+					laptop.setCpu(values.remove(stantekProperties.get("cpuName")));
 				}
-				if(values.containsKey(stantekProperties.getProperty("cpuSeries"))){
-					laptop.setCpuFilter(values.remove(stantekProperties.getProperty("cpuSeries")));
+				if(values.containsKey(stantekProperties.get("cpuSeries"))){
+					laptop.setCpuFilter(values.remove(stantekProperties.get("cpuSeries")));
 				}
 				if(laptop.getCpuFilter().equals("")){
 					laptop.setCpuFilter(laptop.getCpu());
 				}
-				if(values.containsKey(stantekProperties.getProperty("cpu2")) && laptop.getCpuFilter() == null){
-					laptop.setCpuFilter(values.remove(stantekProperties.getProperty("cpu2")));
+				if(values.containsKey(stantekProperties.get("cpu2")) && laptop.getCpuFilter() == null){
+					laptop.setCpuFilter(values.remove(stantekProperties.get("cpu2")));
 				}
 				//DIMENSIONS
-				if(values.containsKey(stantekProperties.getProperty("dimensions"))){
-					laptop.setDimensions(values.remove(stantekProperties.getProperty("dimensions")));
+				if(values.containsKey(stantekProperties.get("dimensions"))){
+					laptop.setDimensions(values.remove(stantekProperties.get("dimensions")));
 				}
-				if(values.containsKey(stantekProperties.getProperty("productDimensions")) && laptop.getDimensions() == null){
-					laptop.setDimensions(values.remove(stantekProperties.getProperty("productDimensions")));
+				if(values.containsKey(stantekProperties.get("productDimensions")) && laptop.getDimensions() == null){
+					laptop.setDimensions(values.remove(stantekProperties.get("productDimensions")));
 				}
 				
 				//SCREEN RESOLUTION, SIZE, INFO
-				if(values.containsKey(stantekProperties.getProperty("displayResolution"))){
-					laptop.setDisplayResolution(values.remove(stantekProperties.getProperty("displayResolution")));
+				if(values.containsKey(stantekProperties.get("displayResolution"))){
+					laptop.setDisplayResolution(values.remove(stantekProperties.get("displayResolution")));
 				}
-				if(values.containsKey(stantekProperties.getProperty("screenResolution")) && laptop.getDisplayResolution() == null){
-					laptop.setDisplayResolution(values.remove(stantekProperties.getProperty("screenResolution")));
+				if(values.containsKey(stantekProperties.get("screenResolution")) && laptop.getDisplayResolution() == null){
+					laptop.setDisplayResolution(values.remove(stantekProperties.get("screenResolution")));
 				}
-				if(values.containsKey(stantekProperties.getProperty("displaySize"))){
-					temp = values.get(stantekProperties.getProperty("displaySize"));
-					laptop.setDisplaySize(values.remove(stantekProperties.getProperty("displaySize")));
+				if(values.containsKey(stantekProperties.get("displaySize"))){
+					temp = values.get(stantekProperties.get("displaySize"));
+					laptop.setDisplaySize(values.remove(stantekProperties.get("displaySize")));
 				}
-				if(values.containsKey(stantekProperties.getProperty("displaySize2")) && laptop.getDisplaySize().equals("")){
-					temp = values.get(stantekProperties.getProperty("displaySize2"));
-					laptop.setDisplaySize(values.remove(stantekProperties.getProperty("displaySize2")));
+				if(values.containsKey(stantekProperties.get("displaySize2")) && laptop.getDisplaySize().equals("")){
+					temp = values.get(stantekProperties.get("displaySize2"));
+					laptop.setDisplaySize(values.remove(stantekProperties.get("displaySize2")));
 				}
-				if(values.containsKey(stantekProperties.getProperty("displayType"))){
-					laptop.setDisplayInfo(values.remove(stantekProperties.getProperty("displayType")));
+				if(values.containsKey(stantekProperties.get("displayType"))){
+					laptop.setDisplayInfo(values.remove(stantekProperties.get("displayType")));
 				}
-				if(values.containsKey(stantekProperties.getProperty("displayType2")) && laptop.getDisplayInfo().equals("")){
-					laptop.setDisplayInfo(values.remove(stantekProperties.getProperty("displayType2")));
+				if(values.containsKey(stantekProperties.get("displayType2")) && laptop.getDisplayInfo().equals("")){
+					laptop.setDisplayInfo(values.remove(stantekProperties.get("displayType2")));
 				}
 				if(laptop.getDisplaySize().equals("")){
 					laptop.setDisplaySize("15.6");
@@ -401,17 +401,17 @@ public class StantekLaptopsBuilder {
 					laptop.setDisplayResolution("1366x768");
 				}
 				//VIDEO
-				if(values.containsKey(stantekProperties.getProperty("graphicsName"))){
-					laptop.setGpu((values.remove(stantekProperties.getProperty("graphicsName"))));
+				if(values.containsKey(stantekProperties.get("graphicsName"))){
+					laptop.setGpu((values.remove(stantekProperties.get("graphicsName"))));
 				}
-				if(values.containsKey(stantekProperties.getProperty("graphics")) && laptop.getGpu().equals("")){
-					laptop.setGpu(values.remove(stantekProperties.getProperty("graphics")));
+				if(values.containsKey(stantekProperties.get("graphics")) && laptop.getGpu().equals("")){
+					laptop.setGpu(values.remove(stantekProperties.get("graphics")));
 				}
-				if(values.containsKey(stantekProperties.getProperty("graphics2")) && laptop.getGpu().equals("")){
-					laptop.setGpu(values.remove(stantekProperties.getProperty("graphics2")));
+				if(values.containsKey(stantekProperties.get("graphics2")) && laptop.getGpu().equals("")){
+					laptop.setGpu(values.remove(stantekProperties.get("graphics2")));
 				}
-				if(values.containsKey(stantekProperties.getProperty("graphicsMB"))){
-					laptop.setGpuMemory((values.remove(stantekProperties.getProperty("graphicsMB"))));
+				if(values.containsKey(stantekProperties.get("graphicsMB"))){
+					laptop.setGpuMemory((values.remove(stantekProperties.get("graphicsMB"))));
 				}
 				if(laptop.getGpu().equals("")){
 					laptop.setGpu("No info");
@@ -420,27 +420,27 @@ public class StantekLaptopsBuilder {
 					laptop.setGpuMemory("No info");
 				}
 				//Optical
-				if(values.containsKey(stantekProperties.getProperty("optical"))){
-					laptop.setOptical(values.remove(stantekProperties.getProperty("optical")));
+				if(values.containsKey(stantekProperties.get("optical"))){
+					laptop.setOptical(values.remove(stantekProperties.get("optical")));
 				}
 				else{
 					laptop.setOptical("X");
 				}
 				//RAM and Info
-				if(values.containsKey(stantekProperties.getProperty("memoryMB"))){
-					laptop.setMemoryRam(values.remove(stantekProperties.getProperty("memoryMB")));
+				if(values.containsKey(stantekProperties.get("memoryMB"))){
+					laptop.setMemoryRam(values.remove(stantekProperties.get("memoryMB")));
 				}
-				if(values.containsKey(stantekProperties.getProperty("memoryType"))){
-					laptop.setMemoryInfo(values.remove(stantekProperties.getProperty("memoryType")));
+				if(values.containsKey(stantekProperties.get("memoryType"))){
+					laptop.setMemoryInfo(values.remove(stantekProperties.get("memoryType")));
 				}
-				if(values.containsKey(stantekProperties.getProperty("memoryType2")) && laptop.getMemoryInfo().equals("")){
-					laptop.setMemoryInfo(values.remove(stantekProperties.getProperty("memoryType")));
+				if(values.containsKey(stantekProperties.get("memoryType2")) && laptop.getMemoryInfo().equals("")){
+					laptop.setMemoryInfo(values.remove(stantekProperties.get("memoryType")));
 				}
-				if(values.containsKey(stantekProperties.getProperty("memoryType3")) && laptop.getMemoryInfo().equals("")){
-					laptop.setMemoryInfo(values.remove(stantekProperties.getProperty("memoryType3")));
+				if(values.containsKey(stantekProperties.get("memoryType3")) && laptop.getMemoryInfo().equals("")){
+					laptop.setMemoryInfo(values.remove(stantekProperties.get("memoryType3")));
 				}
-				if(values.containsKey(stantekProperties.getProperty("memory")) && laptop.getMemoryRam().equals("")){
-					laptop.setMemoryRam(values.remove(stantekProperties.getProperty("memory")));
+				if(values.containsKey(stantekProperties.get("memory")) && laptop.getMemoryRam().equals("")){
+					laptop.setMemoryRam(values.remove(stantekProperties.get("memory")));
 				}
 				if(laptop.getMemoryRam().equals(" GB") || laptop.getMemoryRam().equals("0 GB") || laptop.getMemoryRam().equals("")){
 					laptop.setMemoryRam("4 GB");
@@ -449,89 +449,89 @@ public class StantekLaptopsBuilder {
 					laptop.setMemoryInfo("No Info");
 				}
 				//WIFI
-				if(values.containsKey(stantekProperties.getProperty("wireless"))){
-					laptop.setWifi(values.remove(stantekProperties.getProperty("wireless")));
+				if(values.containsKey(stantekProperties.get("wireless"))){
+					laptop.setWifi(values.remove(stantekProperties.get("wireless")));
 				}
-				if(values.containsKey(stantekProperties.getProperty("wifiStandart")) && laptop.getWifi().equals("")){
-					laptop.setWifi(values.remove(stantekProperties.getProperty("wifiStandart")));
+				if(values.containsKey(stantekProperties.get("wifiStandart")) && laptop.getWifi().equals("")){
+					laptop.setWifi(values.remove(stantekProperties.get("wifiStandart")));
 				}
-				if(values.containsKey(stantekProperties.getProperty("wifi")) && laptop.getWifi().equals("")){
-					laptop.setWifi(values.remove(stantekProperties.getProperty("wifi")));
+				if(values.containsKey(stantekProperties.get("wifi")) && laptop.getWifi().equals("")){
+					laptop.setWifi(values.remove(stantekProperties.get("wifi")));
 				}
 				if(laptop.getWifi().equals("")){
 					laptop.setWifi("No Info");
 				}
 				//WARRANTY
-				if(values.containsKey(stantekProperties.getProperty("warranty2"))){
-					laptop.setWarranty(values.remove(stantekProperties.getProperty("warranty2")));
+				if(values.containsKey(stantekProperties.get("warranty2"))){
+					laptop.setWarranty(values.remove(stantekProperties.get("warranty2")));
 				}
-				if(values.containsKey(stantekProperties.getProperty("warranty2")) && laptop.getWarranty().equals("")){
-					laptop.setWarranty(values.remove(stantekProperties.getProperty("warranty2")));
+				if(values.containsKey(stantekProperties.get("warranty2")) && laptop.getWarranty().equals("")){
+					laptop.setWarranty(values.remove(stantekProperties.get("warranty2")));
 				}
 				if(laptop.getWarranty().equals("")){
 					laptop.setWarranty("24 месеца");
 				}
 				//OS
-				if(values.containsKey(stantekProperties.getProperty("os"))){
-					laptop.setOsFilter(values.remove(stantekProperties.getProperty("os")));
+				if(values.containsKey(stantekProperties.get("os"))){
+					laptop.setOsFilter(values.remove(stantekProperties.get("os")));
 				}
-				if(values.containsKey(stantekProperties.getProperty("os2")) && laptop.getOsFilter().equals("")){
-					laptop.setOsFilter(values.remove(stantekProperties.getProperty("os2")));
+				if(values.containsKey(stantekProperties.get("os2")) && laptop.getOsFilter().equals("")){
+					laptop.setOsFilter(values.remove(stantekProperties.get("os2")));
 				}
-				if(values.containsKey(stantekProperties.getProperty("osName")) && laptop.getOsFilter().equals("")){
-					laptop.setOsFilter(values.remove(stantekProperties.getProperty("osName")));
+				if(values.containsKey(stantekProperties.get("osName")) && laptop.getOsFilter().equals("")){
+					laptop.setOsFilter(values.remove(stantekProperties.get("osName")));
 				}
 				if(laptop.getOsFilter().equals("")){
 					laptop.setOsFilter("DOS");
 				}
 				//PORTS
 				temp = "";
-				if(values.containsKey(stantekProperties.getProperty("usb"))){
-					temp = values.remove(stantekProperties.getProperty("usb"));
+				if(values.containsKey(stantekProperties.get("usb"))){
+					temp = values.remove(stantekProperties.get("usb"));
 				}
-				if(values.containsKey(stantekProperties.getProperty("hdmiPort"))){
-					temp = temp + " " + stantekProperties.getProperty("hdmiPort") + ": " + values.remove(stantekProperties.getProperty("hdmiPort"));
+				if(values.containsKey(stantekProperties.get("hdmiPort"))){
+					temp = temp + " " + stantekProperties.get("hdmiPort") + ": " + values.remove(stantekProperties.get("hdmiPort"));
 				}
-				if(values.containsKey(stantekProperties.getProperty("rj45"))){
-					temp = temp + " " + stantekProperties.getProperty("rj45") + ": " + values.remove(stantekProperties.getProperty("rj45"));
+				if(values.containsKey(stantekProperties.get("rj45"))){
+					temp = temp + " " + stantekProperties.get("rj45") + ": " + values.remove(stantekProperties.get("rj45"));
 				}
-				if(values.containsKey(stantekProperties.getProperty("rj11"))){
-					temp = temp + " " + stantekProperties.getProperty("rj11") + ": " + values.remove(stantekProperties.getProperty("rj11"));
+				if(values.containsKey(stantekProperties.get("rj11"))){
+					temp = temp + " " + stantekProperties.get("rj11") + ": " + values.remove(stantekProperties.get("rj11"));
 				}
-				if(values.containsKey(stantekProperties.getProperty("ieee1394FireWire"))){
-					temp = temp + " " + stantekProperties.getProperty("ieee1394FireWire") + ": " + values.remove(stantekProperties.getProperty("ieee1394FireWire"));
+				if(values.containsKey(stantekProperties.get("ieee1394FireWire"))){
+					temp = temp + " " + stantekProperties.get("ieee1394FireWire") + ": " + values.remove(stantekProperties.get("ieee1394FireWire"));
 				}
-				if(values.containsKey(stantekProperties.getProperty("mic-spk"))){
-					temp = temp + " " + stantekProperties.getProperty("mic-spk") + ": " + values.remove(stantekProperties.getProperty("mic-spk"));
+				if(values.containsKey(stantekProperties.get("mic-spk"))){
+					temp = temp + " " + stantekProperties.get("mic-spk") + ": " + values.remove(stantekProperties.get("mic-spk"));
 				}
-				if(values.containsKey(stantekProperties.getProperty("miniDisplayPort"))){
-					temp = temp + " " + stantekProperties.getProperty("miniDisplayPort") + ": " + values.remove(stantekProperties.getProperty("miniDisplayPort"));
+				if(values.containsKey(stantekProperties.get("miniDisplayPort"))){
+					temp = temp + " " + stantekProperties.get("miniDisplayPort") + ": " + values.remove(stantekProperties.get("miniDisplayPort"));
 				}
-				if(values.containsKey(stantekProperties.getProperty("miniVga"))){
-					temp = temp + " " + stantekProperties.getProperty("miniVga") + ": " + values.remove(stantekProperties.getProperty("miniVga"));
+				if(values.containsKey(stantekProperties.get("miniVga"))){
+					temp = temp + " " + stantekProperties.get("miniVga") + ": " + values.remove(stantekProperties.get("miniVga"));
 				}
-				if(values.containsKey(stantekProperties.getProperty("miniHdmi"))){
-					temp = temp + " " + stantekProperties.getProperty("miniHdmi") + ": " + values.remove(stantekProperties.getProperty("miniHdmi"));
+				if(values.containsKey(stantekProperties.get("miniHdmi"))){
+					temp = temp + " " + stantekProperties.get("miniHdmi") + ": " + values.remove(stantekProperties.get("miniHdmi"));
 				}
-				if(values.containsKey(stantekProperties.getProperty("oneLink"))){
-					temp = temp + " " + stantekProperties.getProperty("oneLink") + ": " + values.remove(stantekProperties.getProperty("oneLink"));
+				if(values.containsKey(stantekProperties.get("oneLink"))){
+					temp = temp + " " + stantekProperties.get("oneLink") + ": " + values.remove(stantekProperties.get("oneLink"));
 				}
-				if(values.containsKey(stantekProperties.getProperty("parallelPort"))){
-					temp = temp + " " + stantekProperties.getProperty("parallelPort") + ": " + values.remove(stantekProperties.getProperty("parallelPort"));
+				if(values.containsKey(stantekProperties.get("parallelPort"))){
+					temp = temp + " " + stantekProperties.get("parallelPort") + ": " + values.remove(stantekProperties.get("parallelPort"));
 				}
 				laptop.setPorts(temp);
 				
 				//HDD and HDD Filter
-				if(values.containsKey(stantekProperties.getProperty("hdd"))){
-					laptop.setHdd(values.remove(stantekProperties.getProperty("hdd")));	
+				if(values.containsKey(stantekProperties.get("hdd"))){
+					laptop.setHdd(values.remove(stantekProperties.get("hdd")));	
 					System.out.println("from hdd " + laptop.getHdd());
 				}
-				if(values.containsKey(stantekProperties.getProperty("hddType")) && laptop.getHdd() == null){
-					laptop.setHdd(values.remove(stantekProperties.getProperty("hddType")));
+				if(values.containsKey(stantekProperties.get("hddType")) && laptop.getHdd() == null){
+					laptop.setHdd(values.remove(stantekProperties.get("hddType")));
 					System.out.println("from hddType " + laptop.getHdd());
 				}
 				temp = new String();
-				temp = values.remove(stantekProperties.getProperty("hddSize"));
+				temp = values.remove(stantekProperties.get("hddSize"));
 				if(temp != null){
 					st2 = new StringBuilder();
 					for(int i = 0; i < temp.length(); i++){
@@ -549,8 +549,8 @@ public class StantekLaptopsBuilder {
 					laptop.setHddSize(st2.toString());
 				}
 				temp = new String();
-				if(laptop.getHddSize().equals("") && values.containsKey(stantekProperties.getProperty("hddGB"))){
-					temp = values.remove(stantekProperties.getProperty("hddGB"));
+				if(laptop.getHddSize().equals("") && values.containsKey(stantekProperties.get("hddGB"))){
+					temp = values.remove(stantekProperties.get("hddGB"));
 					if(temp != null){
 						st2 = new StringBuilder();
 						for(int i = 0; i < temp.length(); i++){
