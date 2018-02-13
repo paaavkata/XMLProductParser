@@ -33,6 +33,7 @@ public class MainDownloader {
 		solytronCategories = loader.getSolytronCategories();
 	}
 	public int downloadCategory(String category){
+		//0.url, 1.category , 2.subcategory
 		String[] params = solytronCategories.get(category).split(",");
 		List<SolytronProduct> categoryProducts;
 		try{
@@ -49,9 +50,9 @@ public class MainDownloader {
 		System.out.println(categoryProducts.size());
 		for(SolytronProduct productSimple : categoryProducts){
 			productCounter++;
-//			if(productCounter < 58){
-//				continue;
-//			}
+			if(productCounter < 232){
+				continue;
+			}
 			long time = System.currentTimeMillis();
 			System.out.println(productCounter);
 			SolytronProduct product;
@@ -86,9 +87,9 @@ public class MainDownloader {
 			catch(Exception e){
 				System.out.println("Error while downloading images for product " + product.getCodeId());
 			}
-//			if(productCounter >= 20){
-//				break;
-//			}
+			if(productCounter >= 250){
+				break;
+			}
 			productsNew.add(product);
 			long time2 = System.currentTimeMillis();
 			System.out.println("Total time: " + (time2-time));

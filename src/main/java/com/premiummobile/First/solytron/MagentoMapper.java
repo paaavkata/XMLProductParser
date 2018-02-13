@@ -15,6 +15,7 @@ import com.premiummobile.First.magento.MagentoProductRequest;
 import com.premiummobile.First.magento.MagentoStockItemRequest;
 import com.premiummobile.First.solytron.Model.Image;
 import com.premiummobile.First.solytron.Model.Property;
+import com.premiummobile.First.solytron.Model.PropertyGroup;
 import com.premiummobile.First.solytron.Model.SolytronProduct;
 import com.premiummobile.First.util.PropertiesLoader;
 import com.premiummobile.First.util.RequestsExecutor;
@@ -53,9 +54,16 @@ public class MagentoMapper {
 	public MagentoProductRequest mapProduct(SolytronProduct product, String[] params){
 		MagentoProductRequest magentoProduct = new MagentoProductRequest();
 		HashMap<Integer, String> properties = new HashMap<Integer, String>();
-		if(product.getProperties().get(1) != null && product.getProperties().get(1).getList() != null){
-			for(Property property : product.getProperties().get(1).getList()){
-				properties.put(property.getPropertyId(), property.getValue().get(0).getText());
+		KeyValueAttribute productGroup = new KeyValueAttribute();
+		productGroup.setAttributeCode("product_group");
+		if(product.getProperties().size() > 0){
+			for(PropertyGroup g : product.getProperties()){
+				productGroup.setValue(g.getProductGroupName() != null ? g.getProductGroupName() : "");
+				if(g.getList() != null){
+					for(Property property : g.getList()){
+						properties.put(property.getPropertyId(), property.getValue().get(0).getText());
+					}
+				}
 			}
 		}
 		magentoProduct.setStatus(1);
@@ -107,54 +115,39 @@ public class MagentoMapper {
 		}
 		magentoProduct.setExtensionAttributes(new ExtensionAttribute());
 		magentoProduct.getExtensionAttributes().setItem(magentoStockItem);
-		if(product.getProperties().get(1).getList() != null){
-			switch(params[1]){
-				case "4":
-					magentoProduct.setCustomAttributes(helper.generateLaptopAttributes(product.getProperties().get(1).getList()));
-					magentoProduct.setAttributeSetId(10);
-					break;
-				
-				case "5":
-					magentoProduct.setCustomAttributes(helper.generateTabletAttributes(product.getProperties().get(1).getList()));
-					magentoProduct.setAttributeSetId(11);
-					break;
-				
-				default:
-					magentoProduct.setCustomAttributes(helper.generateSimpleAttributes(product.getProperties().get(1).getList()));
-					magentoProduct.setAttributeSetId(12);
-					break;
-			}
+		List<Property> innerProperties = product.getProperties().get(1).getList();
+		switch(params[1]){
+			case "4":
+				if(innerProperties != null){
+					magentoProduct.setCustomAttributes(helper.generateLaptopAttributes(innerProperties));
+				}
+				magentoProduct.setAttributeSetId(10);
+				break;
+			
+			case "5":
+				if(innerProperties != null){
+					magentoProduct.setCustomAttributes(helper.generateTabletAttributes(innerProperties));
+				}
+				magentoProduct.setAttributeSetId(11);
+				break;
+			
+			default:
+				if(innerProperties != null){
+					magentoProduct.setCustomAttributes(helper.generateSimpleAttributes(innerProperties));
+				}
+				magentoProduct.setAttributeSetId(12);
+				break;
 		}
-		else{
+		if(magentoProduct.getCustomAttributes() == null){
 			magentoProduct.setCustomAttributes(new ArrayList<Attribute>());
-		}
+		}		
+		
+		magentoProduct.getCustomAttributes().add(productGroup);
+		
 		KeyValueAttribute brand = new KeyValueAttribute();
 		brand.setAttributeCode("gsm_manufacturer");
 		if(product.getVendor() == null){
-			if(productName.contains("Lenovo") || productName.contains("LENOVO")){
-				brand.setValue(magentoAttributesReversed.get("Lenovo"));
-			}
-			else if(productName.contains("Acer") || productName.contains("ACER")){
-				brand.setValue(magentoAttributesReversed.get("Acer"));
-			}
-			else if(productName.contains("HP") || productName.contains("Hewl")){
-				brand.setValue(magentoAttributesReversed.get("HP"));
-			}
-			else if(productName.contains("Dell") || productName.contains("DELL")){
-				brand.setValue(magentoAttributesReversed.get("DELL"));
-			}
-			else if(productName.contains("Asus") || productName.contains("ASUS")){
-				brand.setValue(magentoAttributesReversed.get("ASUS"));
-			}
-			else if(productName.contains("Apple") || productName.contains("APPLE")){
-				brand.setValue(magentoAttributesReversed.get("Apple"));
-			}
-			else if(productName.contains("Toshiba") || productName.contains("TOSHIBA")){
-				brand.setValue(magentoAttributesReversed.get("Toshiba"));
-			}
-			else{
-				brand.setValue(magentoAttributesReversed.get("Други"));
-			}
+			brand.setValue(helper.generateBrand(productName));
 		}
 		else{
 			brand.setValue(helper.generateBrand(product.getVendor()));
@@ -171,7 +164,8 @@ public class MagentoMapper {
 		url.setAttributeCode("url_key");
 		
 		String uniqueName;
-		if(urls.containsKey(productName)){
+		String productName2 = productName.replace((char) 34, (char) 0);
+		if(urls.containsKey(productName2)){
 			int counter = urls.get(productName);
 			uniqueName = productName + counter;
 			urls.remove(productName);
@@ -181,7 +175,7 @@ public class MagentoMapper {
 			urls.put(productName, 1);
 			uniqueName = productName;
 		}
-		uniqueName.replace((char) 34, (char) 0);
+//		uniqueName.replace((char) 34, (char) 0);
 		if(magentoProduct.getPrice() > 150){
 			metaTitle.setValue(uniqueName + " на топ цена и на изплащане от Примиъм Мобайл ЕООД - ревю, мнения, характеристики");
 			metaDescription.setValue("Купете днес " + uniqueName + " на изплащане и на супер цена с минимално оскъпяване и светкавично одобрение от PremiumMobile.bg. Бърза доставка на следващия ден и любезно обслужване.");
@@ -196,6 +190,11 @@ public class MagentoMapper {
 		magentoProduct.getCustomAttributes().add(url);
 		magentoProduct.getCustomAttributes().add(metaDescription);
 		magentoProduct.getCustomAttributes().add(metaTitle);
+		
+		KeyValueAttribute ean = new KeyValueAttribute();
+		ean.setAttributeCode("ean");
+		ean.setValue(product.getEan());
+		magentoProduct.getCustomAttributes().add(ean);
 		
 		KeyListAttribute categories = new KeyListAttribute();
 		categories.setAttributeCode("category_ids");

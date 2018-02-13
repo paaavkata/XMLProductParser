@@ -163,8 +163,8 @@ public class RequestsExecutor {
 		MagentoPostProduct postProduct = new MagentoPostProduct();
 		postProduct.setMagentoProduct(product);
 		StringEntity params = new StringEntity(om.writeValueAsString(postProduct), "UTF-8");
-//		System.out.println("Product Json: ");
-//		System.out.println(om.writeValueAsString(postProduct));
+		System.out.println("Product Json: ");
+		System.out.println(om.writeValueAsString(postProduct));
 		System.out.println("Product: " + product.getName() + " " + product.getSku());
 		URIBuilder builder = new URIBuilder();
 		builder.setScheme("http").setHost(magentoProperties.get("host"));
