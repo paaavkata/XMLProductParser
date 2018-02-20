@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class MagentoProductResponse {
+public class MagentoProductResponse implements MagentoProduct{
 
 	private Integer id;
 	private String sku;

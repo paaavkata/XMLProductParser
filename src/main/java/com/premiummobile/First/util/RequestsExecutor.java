@@ -2,6 +2,7 @@ package com.premiummobile.First.util;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,11 +37,13 @@ import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
+import com.premiummobile.First.domain.StockInfoProduct;
 import com.premiummobile.First.magento.Attribute;
 import com.premiummobile.First.magento.ExtensionAttribute;
 import com.premiummobile.First.magento.ItemResponse;
 import com.premiummobile.First.magento.MagentoAttribute;
 import com.premiummobile.First.magento.MagentoPostProduct;
+import com.premiummobile.First.magento.MagentoProduct;
 import com.premiummobile.First.magento.MagentoProductRequest;
 import com.premiummobile.First.magento.MediaGalleryContent;
 import com.premiummobile.First.magento.MediaGalleryEntry;
@@ -51,6 +54,7 @@ import com.premiummobile.First.magento.TierPrice;
 import com.premiummobile.First.solytron.Model.Category;
 import com.premiummobile.First.solytron.Model.ProductSet;
 import com.premiummobile.First.solytron.Model.SolytronProduct;
+import com.premiummobile.First.stantek.Model.StantekPriceList;
 	
 @Component
 public class RequestsExecutor {
@@ -65,6 +69,8 @@ public class RequestsExecutor {
 	
 	private HashMap<String, String> solytronProperties;
 	
+	private HashMap<String, String> stantekProperties;
+	
 	private HashMap<String, String> magentoProperties;
 	
 	@Autowired
@@ -72,6 +78,7 @@ public class RequestsExecutor {
 		this.om = om;
 		this.loader = loader;
 		this.solytronProperties = loader.getSolytron();
+		this.stantekProperties = loader.getStantek();
 		this.magentoProperties = loader.getMagento();
 		this.magentoAuthenticate();
 	}
@@ -81,7 +88,7 @@ public class RequestsExecutor {
 		
 		PoolingHttpClientConnectionManager manager = new PoolingHttpClientConnectionManager();
 		manager.setMaxTotal(30);
-		manager.setDefaultMaxPerRoute(10);
+		manager.setDefaultMaxPerRoute(20);
 		CloseableHttpClient client = HttpClientBuilder.create().setConnectionManager(manager).build();
 		
 		return client;
@@ -158,14 +165,14 @@ public class RequestsExecutor {
 		
 	}
 	
-	public String updateMagentoProduct(MagentoProductRequest product) throws Exception{
+	public String updateMagentoProduct(MagentoProduct product) throws Exception{
 		CloseableHttpClient client = this.getClient();
 		MagentoPostProduct postProduct = new MagentoPostProduct();
 		postProduct.setMagentoProduct(product);
 		StringEntity params = new StringEntity(om.writeValueAsString(postProduct), "UTF-8");
 		System.out.println("Product Json: ");
 		System.out.println(om.writeValueAsString(postProduct));
-		System.out.println("Product: " + product.getName() + " " + product.getSku());
+//		System.out.println("Product: " + product.getName() + " " + product.getSku());
 		URIBuilder builder = new URIBuilder();
 		builder.setScheme("http").setHost(magentoProperties.get("host"));
 		builder.setPath(magentoProperties.get("product"));
@@ -384,5 +391,31 @@ public class RequestsExecutor {
 			}
 		}
 		return result;
+	}
+
+	public void updateMagentoStockInfo(StockInfoProduct stockInfoProduct) throws Exception {
+		this.updateMagentoProduct(stockInfoProduct);
+		
+	}
+	
+	public StantekPriceList getStantekFile(){
+		HttpGet httpGet = new HttpGet(stantekProperties.get("url"));
+		CloseableHttpResponse response;
+		try {
+			response = this.getClient().execute(httpGet);
+		} catch (IOException e) {
+			response = null;
+			e.printStackTrace();
+		}
+		StantekPriceList priceList = null;
+		if(response.getEntity() != null){
+			try {
+				priceList = getSerializer().read(StantekPriceList.class, response.getEntity().getContent());
+			} catch (Exception e) {
+				priceList = new StantekPriceList();
+				e.printStackTrace();
+			}
+		}
+		return priceList;
 	}
 }

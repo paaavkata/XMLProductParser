@@ -609,7 +609,7 @@ public class StantekLaptopsBuilder {
 		return result;
 	}
 	
-	private HashMap<String, String> getValues(String desc){
+	public HashMap<String, String> getValues(String desc){
 		HashMap<String, String> values = new HashMap<String, String>();
 		for(int i = 0; i < desc.length(); i++){
 			if(desc.charAt(i) == '['){

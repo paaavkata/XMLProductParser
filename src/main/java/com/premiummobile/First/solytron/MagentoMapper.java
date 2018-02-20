@@ -17,6 +17,7 @@ import com.premiummobile.First.solytron.Model.Image;
 import com.premiummobile.First.solytron.Model.Property;
 import com.premiummobile.First.solytron.Model.PropertyGroup;
 import com.premiummobile.First.solytron.Model.SolytronProduct;
+import com.premiummobile.First.stantek.Model.StantekProduct;
 import com.premiummobile.First.util.PropertiesLoader;
 import com.premiummobile.First.util.RequestsExecutor;
 	
@@ -51,7 +52,7 @@ public class MagentoMapper {
 		this.magentoCategories = loader.getMagentoCategories();
 	}
 	
-	public MagentoProductRequest mapProduct(SolytronProduct product, String[] params){
+	public MagentoProductRequest mapSolytronProduct(SolytronProduct product, String[] params){
 		MagentoProductRequest magentoProduct = new MagentoProductRequest();
 		HashMap<Integer, String> properties = new HashMap<Integer, String>();
 		KeyValueAttribute productGroup = new KeyValueAttribute();
@@ -112,6 +113,10 @@ public class MagentoMapper {
 				magentoStockItem.setStock(false);
 				magentoStockItem.setQty(0);
 			}
+		}
+		else{
+			magentoStockItem.setStock(false);
+			magentoStockItem.setQty(0);
 		}
 		magentoProduct.setExtensionAttributes(new ExtensionAttribute());
 		magentoProduct.getExtensionAttributes().setItem(magentoStockItem);
@@ -262,5 +267,12 @@ public class MagentoMapper {
 			st.append(name.charAt(i));
 		}
 		return st.toString().trim();
+	}
+	
+	public MagentoProductRequest mapStantekProduct(StantekProduct product){
+		MagentoProductRequest magentoProduct = new MagentoProductRequest();
+		
+		
+		return magentoProduct;
 	}
 }

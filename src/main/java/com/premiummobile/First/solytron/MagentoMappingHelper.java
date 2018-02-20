@@ -61,7 +61,7 @@ PropertiesLoader loader;
 		KeyListAttribute hddFilter = new KeyListAttribute();
 		hddFilter.setAttributeCode("hdd_razmer_filt_r_laptop");
 		hddFilter.setValues(new ArrayList<String>());
-		hddFilter.getValues().add(makeHddFilter(properties.get(11)));
+		hddFilter.getValues().add(generateHddFilter(properties.get(11)));
 		customAttributes.add(hddFilter);
 		
 		KeyValueAttribute battery = new KeyValueAttribute();
@@ -529,7 +529,7 @@ PropertiesLoader loader;
 		return magentoAttributesReversed.get("1366x768");
 	}
 
-	private String makeHddFilter(String string) {
+	private String generateHddFilter(String string) {
 		StringBuilder st = new StringBuilder();
 		for(int i = 0; i < string.length(); i++){
 			if(string.charAt(i) == ' ' || string.charAt(i) == 'T' || string.charAt(i) == 'G'){
