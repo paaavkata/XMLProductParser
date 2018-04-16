@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.premiummobile.First.magento.MagentoAttribute;
 import com.premiummobile.First.magento.MagentoProductRequest;
 import com.premiummobile.First.solytron.MainDownloader;
 import com.premiummobile.First.solytron.Model.SolytronProduct;
@@ -39,8 +40,8 @@ public class SolytronController {
 	
 	@GetMapping("/readMagentoAttributes")
 	@ResponseBody
-	public List<String> readAttributes() throws Exception{
-		List<String> response = downloader.downloadMagentoAttributes();
+	public List<MagentoAttribute> readAttributes() throws Exception{
+		List<MagentoAttribute> response = downloader.downloadMagentoAttributes();
 		
 		return response;
 	}

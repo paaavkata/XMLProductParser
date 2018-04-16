@@ -22,7 +22,7 @@ public class MagentoProductResponse implements MagentoProduct{
 	private String typeId;
 	private Double weight;
 	@JsonProperty("extension_attributes")
-	private List<ExtensionAttribute> extensionAttributes;
+	private ExtensionAttributeResponse extensionAttributes;
 	@JsonProperty("product_links")
 	private List<ProductLink> productLinks;
 	private List<Option> options;
@@ -32,7 +32,6 @@ public class MagentoProductResponse implements MagentoProduct{
 	private List<TierPrice> tierPrices;
 	@JsonProperty("custom_attributes")
 	private List<Attribute> customAttributes;
-	
 	
 	public Double getPrice() {
 		return price;
@@ -94,10 +93,10 @@ public class MagentoProductResponse implements MagentoProduct{
 	public void setWeight(Double weight) {
 		this.weight = weight;
 	}
-	public List<ExtensionAttribute> getExtensionAttributes() {
+	public ExtensionAttributeResponse getExtensionAttributes() {
 		return extensionAttributes;
 	}
-	public void setExtensionAttributes(List<ExtensionAttribute> extensionAttributes) {
+	public void setExtensionAttributes(ExtensionAttributeResponse extensionAttributes) {
 		this.extensionAttributes = extensionAttributes;
 	}
 	public List<ProductLink> getProductLinks() {

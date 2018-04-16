@@ -2,7 +2,7 @@ package com.premiummobile.First.magento;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class ExtensionAttribute {
+public class ExtensionAttributeRequest {
 	
 	@JsonProperty("stock_item")
 	private MagentoStockItemRequest item;

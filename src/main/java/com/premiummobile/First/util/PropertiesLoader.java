@@ -37,6 +37,8 @@ public class PropertiesLoader {
 	private final String solytronTablet = "solytronTablet.properties";
 	private final String solytronCategories = "solytronCategories.properties";
 	private final String filePath = "StockInfo.json";
+	private final String brands = "brands.properties";
+	private final String colors = "colors.properties";
 	
 	@Autowired
 	ObjectMapper om;
@@ -44,6 +46,16 @@ public class PropertiesLoader {
 	@Bean
 	public HashMap<String, String> getSolytronLaptop(){
 		return load(solytronLaptop);
+	}
+	
+	@Bean
+	public HashMap<String, String> getBrands(){
+		return load(brands);
+	}
+	
+	@Bean
+	public HashMap<String, String> getColors(){
+		return load(colors);
 	}
 	
 	@Bean

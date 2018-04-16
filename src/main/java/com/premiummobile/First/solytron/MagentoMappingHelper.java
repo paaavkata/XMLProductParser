@@ -25,12 +25,16 @@ PropertiesLoader loader;
 	
 	HashMap<String, String> magentoAttributesReversed;
 	
+	HashMap<String, String> colors;
 	
+	HashMap<String, String> brands;
 	
 	@Autowired
 	public MagentoMappingHelper(PropertiesLoader loader){
 		this.loader = loader;
 		this.solytronLaptop = loader.getSolytronLaptop();
+		this.brands = loader.getBrands();
+		this.colors = loader.getColors();
 		this.magentoAttributes = loader.getMagentoAttributes();
 		this.magentoAttributesReversed = loader.getMagentoAttributesReversed();
 	}
@@ -51,17 +55,17 @@ PropertiesLoader loader;
 		return st.toString();
 	}
 
-	public List<Attribute> generateLaptopAttributes(List<Property> productProperties) {
+	public List<Attribute> generateLaptopAttributes(HashMap<Integer, Property> productProperties) {
 		HashMap<Integer, String> properties = new HashMap<Integer, String>();
-		for(Property property : productProperties){
+		for(Property property : productProperties.values()){
 			properties.put(property.getPropertyId(), property.getValue().get(0).getText());
 		}
 		List<Attribute> customAttributes = new ArrayList<Attribute>();
 		
 		KeyListAttribute hddFilter = new KeyListAttribute();
 		hddFilter.setAttributeCode("hdd_razmer_filt_r_laptop");
-		hddFilter.setValues(new ArrayList<String>());
-		hddFilter.getValues().add(generateHddFilter(properties.get(11)));
+		hddFilter.setValue(new ArrayList<String>());
+		hddFilter.getValue().add(generateHddFilter(properties.get(11)));
 		customAttributes.add(hddFilter);
 		
 		KeyValueAttribute battery = new KeyValueAttribute();
@@ -70,14 +74,14 @@ PropertiesLoader loader;
 		customAttributes.add(battery);
 		
 		KeyValueAttribute color = new KeyValueAttribute();
-		color.setAttributeCode("laptop_color");
+		color.setAttributeCode("color");
 		color.setValue(generateColorFilter(properties.remove(71)));
 		customAttributes.add(color);
 		
 		KeyListAttribute cpuFilter = new KeyListAttribute();
 		cpuFilter.setAttributeCode("laptop_cpu_filter");
-		cpuFilter.setValues(new ArrayList<String>());
-		cpuFilter.getValues().add(generateCpuFilter(properties.remove(55), properties.get(2)));
+		cpuFilter.setValue(new ArrayList<String>());
+		cpuFilter.getValue().add(generateCpuFilter(properties.remove(55), properties.get(2)));
 		customAttributes.add(cpuFilter);
 		
 		KeyValueAttribute dimensions = new KeyValueAttribute();
@@ -92,14 +96,14 @@ PropertiesLoader loader;
 		
 		KeyListAttribute displayResolution = new KeyListAttribute();
 		displayResolution.setAttributeCode("laptop_display_resolution");
-		displayResolution.setValues(new ArrayList<String>());
-		displayResolution.getValues().add(generateDisplayResolution(properties.get(1), properties.remove(70)).trim());
+		displayResolution.setValue(new ArrayList<String>());
+		displayResolution.getValue().add(generateDisplayResolution(properties.get(1), properties.remove(70)).trim());
 		customAttributes.add(displayResolution);
 		
 		KeyListAttribute displaySize = new KeyListAttribute();
 		displaySize.setAttributeCode("laptop_display_size");
-		displaySize.setValues(new ArrayList<String>());
-		displaySize.getValues().add(generateDisplaySize(properties.remove(1)));
+		displaySize.setValue(new ArrayList<String>());
+		displaySize.getValue().add(generateDisplaySize(properties.remove(1)));
 		customAttributes.add(displaySize);
 		
 		KeyValueAttribute gpu = new KeyValueAttribute();
@@ -124,8 +128,8 @@ PropertiesLoader loader;
 		
 		KeyListAttribute osFilter = new KeyListAttribute();
 		osFilter.setAttributeCode("laptop_os_filter");
-		osFilter.setValues(new ArrayList<String>());
-		osFilter.getValues().add(generateOsFilter(properties.remove(57)));
+		osFilter.setValue(new ArrayList<String>());
+		osFilter.getValue().add(generateOsFilter(properties.remove(57)));
 		properties.remove(3);
 		customAttributes.add(osFilter);
 		
@@ -136,8 +140,8 @@ PropertiesLoader loader;
 		
 		KeyListAttribute ram = new KeyListAttribute();
 		ram.setAttributeCode("laptop_ram");
-		ram.setValues(new ArrayList<String>());
-		ram.getValues().add(generateRamFilter(properties.remove(5)));
+		ram.setValue(new ArrayList<String>());
+		ram.getValue().add(generateRamFilter(properties.remove(5)));
 		customAttributes.add(ram);
 		
 		KeyValueAttribute ramInfo = new KeyValueAttribute();
@@ -162,7 +166,7 @@ PropertiesLoader loader;
 		
 		KeyListAttribute yesNo = new KeyListAttribute();
 		yesNo.setAttributeCode("laptop_yes_no");
-		yesNo.setValues(generateYesNo(properties.remove(17),properties.remove(51),properties.remove(11), properties.remove(74), properties.remove(38),properties.remove(40),
+		yesNo.setValue(generateYesNo(properties.remove(17),properties.remove(51),properties.remove(11), properties.remove(74), properties.remove(38),properties.remove(40),
 				properties.remove(59),properties.remove(28),properties.remove(62),properties.remove(52),properties.remove(22),properties.remove(9), properties.remove(69)));
 		customAttributes.add(yesNo);
 		
@@ -175,8 +179,8 @@ PropertiesLoader loader;
 		otherInfo.setAttributeCode("laptop_other_info");
 		StringBuilder otherInfoString = new StringBuilder();
 		List<Property> productProperties2 = new ArrayList<Property>();
-		productProperties2.addAll(productProperties);
-		for(Property property : productProperties){
+		productProperties2.addAll(productProperties.values());
+		for(Property property : productProperties.values()){
 			if(property.getPropertyId() == 18){
 				properties.remove(18);
 				portsString.append(property.getName() + ", ");
@@ -253,36 +257,22 @@ PropertiesLoader loader;
 		
 		KeyValueAttribute shortDescription = new KeyValueAttribute();
 		shortDescription.setAttributeCode("short_description");
-		shortDescription.setValue(generateShortDescription(magentoAttributes.get(displaySize.getValues().get(0)), magentoAttributes.get(cpuFilter.getValues().get(0)), 
-				magentoAttributes.get(ram.getValues().get(0)), hddSize.getValue(), battery.getValue()));
+		shortDescription.setValue(generateShortDescription(magentoAttributes.get(displaySize.getValue().get(0)), magentoAttributes.get(cpuFilter.getValue().get(0)), 
+				magentoAttributes.get(ram.getValue().get(0)), hddSize.getValue(), battery.getValue()));
 		customAttributes.add(shortDescription);
 		
 		return customAttributes;
 	}
 
 	public String generateBrand(String brand){
-		if(brand.contains("Lenovo") || brand.contains("LENOVO")){
-			return magentoAttributesReversed.get("Lenovo");
+		if(brand != null && !brand.equals("")){
+			for(String string : brands.keySet()){
+				if(this.contains(string, brand)){
+					return brands.get(string);
+				}
+			}
 		}
-		if(brand.contains("Acer") || brand.contains("ACER")){
-			return magentoAttributesReversed.get("Acer");
-		}
-		if(brand.contains("HP") || brand.contains("Hewl")){
-			return magentoAttributesReversed.get("HP");
-		}
-		if(brand.contains("Dell") || brand.contains("DELL")){
-			return magentoAttributesReversed.get("DELL");
-		}
-		if(brand.contains("Asus") || brand.contains("ASUS")){
-			return magentoAttributesReversed.get("ASUS");
-		}
-		if(brand.contains("Apple") || brand.contains("APPLE")){
-			return magentoAttributesReversed.get("Apple");
-		}
-		if(brand.contains("Toshiba") || brand.contains("TOSHIBA")){
-			return magentoAttributesReversed.get("Toshiba");
-		}
-		return magentoAttributesReversed.get("Други");
+		return brands.get("Други");
 	}
 	
 	private String generateHddSize(String string) {
@@ -305,20 +295,20 @@ PropertiesLoader loader;
 
 	private String generateOsFilter(String string) {
 		if(string != null && !string.equals("")){
-			if(string.contains("indows")){
+			if(this.contains("Windows", string)){
 				return magentoAttributesReversed.get("Windows");
 			}
-			if(string.contains("DOS") || string.contains("No OS")){
-				return magentoAttributesReversed.get("DOS");
+			if(this.contains("DOS", string) || this.contains("No OS", string)){
+				return magentoAttributesReversed.get("MS-Dos");
 			}
-			if(string.contains("Mac")){
+			if(this.contains("Mac", string)){
 				return magentoAttributesReversed.get("Mac OS");
 			}
-			if(string.contains("inux")){
+			if(this.contains("Linux", string)){
 				return magentoAttributesReversed.get("Linux");
 			}
 		}
-		return magentoAttributesReversed.get("DOS");
+		return magentoAttributesReversed.get("MS-Dos");
 	}
 	
 	private String generateRamFilter(String memory){
@@ -349,66 +339,47 @@ PropertiesLoader loader;
 
 	private String generateColorFilter(String color) {
 		if(color != null && !color.equals("")){
-			if(Pattern.compile(Pattern.quote("black"), Pattern.CASE_INSENSITIVE).matcher(color).find()){
-				return magentoAttributesReversed.get("Черен");
-			}
-			if(Pattern.compile(Pattern.quote("черен"), Pattern.CASE_INSENSITIVE).matcher(color).find()){
-				return magentoAttributesReversed.get("Черен");
-			}
-			if(Pattern.compile(Pattern.quote("blue"), Pattern.CASE_INSENSITIVE).matcher(color).find()){
-				return magentoAttributesReversed.get("Син");
-			}
-			if(Pattern.compile(Pattern.quote("red"), Pattern.CASE_INSENSITIVE).matcher(color).find()){
-				return magentoAttributesReversed.get("Червен");
-			}
-			if(Pattern.compile(Pattern.quote("white"), Pattern.CASE_INSENSITIVE).matcher(color).find()){
-				return magentoAttributesReversed.get("Бял");
-			}
-			if(Pattern.compile(Pattern.quote("gray"), Pattern.CASE_INSENSITIVE).matcher(color).find()){
-				return magentoAttributesReversed.get("Сив");
-			}
-			if(Pattern.compile(Pattern.quote("grey"), Pattern.CASE_INSENSITIVE).matcher(color).find()){
-				return magentoAttributesReversed.get("Сив");
-			}
-			if(Pattern.compile(Pattern.quote("silver"), Pattern.CASE_INSENSITIVE).matcher(color).find()){
-				return magentoAttributesReversed.get("Сребрист");
-			}
-			if(Pattern.compile(Pattern.quote("gold"), Pattern.CASE_INSENSITIVE).matcher(color).find()){
-				return magentoAttributesReversed.get("Златист");
-			}
-			if(Pattern.compile(Pattern.quote("purple"), Pattern.CASE_INSENSITIVE).matcher(color).find()){
-				return magentoAttributesReversed.get("Лилав");
+			for(String string : colors.keySet()){
+				if(this.contains(string, color)){
+					return colors.get(string);
+				}
 			}
 		}
-		return magentoAttributesReversed.get("Черен");
+		return colors.get("Black");
+	}
+	
+	private boolean contains(String string, String contains){
+		return contains.toLowerCase().contains(string.toLowerCase());
+//		return Pattern.compile(Pattern.quote(contains), Pattern.CASE_INSENSITIVE).matcher(string).find();
+		
 	}
 
 	private String generateCpuFilter(String cpuFilter, String cpuFilter2) {
 		if(cpuFilter == null || cpuFilter.equals("")){
 			cpuFilter = cpuFilter2;
 		}
-		if(cpuFilter.contains("i7")){
+		if(this.contains("i7", cpuFilter)){
 			return magentoAttributesReversed.get("Intel Core i7");
 		}
-		if(cpuFilter.contains("i5")){
+		if(this.contains("i5", cpuFilter)){
 			return magentoAttributesReversed.get("Intel Core i5");
 		}
-		if(cpuFilter.contains("i3")){
+		if(this.contains("i3", cpuFilter)){
 			return magentoAttributesReversed.get("Intel Core i3");
 		}
-		if(cpuFilter.contains("entium")){
+		if(this.contains("entium", cpuFilter)){
 			return magentoAttributesReversed.get("Intel Pentium");
 		}
-		if(cpuFilter.contains("AMD")){
+		if(this.contains("AMD", cpuFilter)){
 			return magentoAttributesReversed.get("AMD");
 		}
-		if(cpuFilter.contains("eleron")){
+		if(this.contains("eleron", cpuFilter)){
 			return magentoAttributesReversed.get("Intel Celeron");
 		}
-		if(cpuFilter.contains("eon")){
+		if(this.contains("eon", cpuFilter)){
 			return magentoAttributesReversed.get("Intel Xeon");
 		}
-		if(cpuFilter.contains("tom")){
+		if(this.contains("tom", cpuFilter)){
 			return magentoAttributesReversed.get("Intel Atom");
 		}
 		return magentoAttributesReversed.get("Intel Core i3");
@@ -568,12 +539,12 @@ PropertiesLoader loader;
 		return magentoAttributesReversed.get("401-600 GB");
 	}
 
-	public List<Attribute> generateSimpleAttributes(List<Property> list) {
+	public List<Attribute> generateSimpleAttributes(HashMap<Integer, Property> list) {
 		KeyValueAttribute description = new KeyValueAttribute();
 		description.setAttributeCode("description");
 		StringBuilder st = new StringBuilder();
 		st.append("<h4>");
-		for(Property property : list){
+		for(Property property : list.values()){
 			st.append(property.getName() + ": " + property.getValue().get(0).getText() + "<br>");
 		}
 		st.append("</h4>");
@@ -583,8 +554,212 @@ PropertiesLoader loader;
 		return attributes;
 	}
 
-	public List<Attribute> generateTabletAttributes(List<Property> list) {
-		// TODO Auto-generated method stub
-		return null;
+	public List<Attribute> generateTabletAttributes(HashMap<Integer, Property> list) {
+		HashMap<Integer, String> properties = new HashMap<Integer, String>();
+//		for(Property property : list){
+//			properties.put(property.getPropertyId(), property.getValue().get(0).getText());
+//		}
+		List<Attribute> customAttributes = new ArrayList<Attribute>();
+		
+		KeyListAttribute hddFilter = new KeyListAttribute();
+		hddFilter.setAttributeCode("memory_tablet");
+		hddFilter.setValue(new ArrayList<String>());
+		hddFilter.getValue().add(generateHddFilter(properties.get(5)));
+		customAttributes.add(hddFilter);
+		
+		KeyValueAttribute battery = new KeyValueAttribute();
+		battery.setAttributeCode("tablet_battery");
+		battery.setValue((properties.get(43) != null ? properties.remove(43) : "" + properties.get(44) != null ? " " + properties.remove(44) : ""));
+		customAttributes.add(battery);
+		
+		KeyValueAttribute color = new KeyValueAttribute();
+		color.setAttributeCode("color");
+		color.setValue(generateColorFilter(properties.remove(35)));
+		customAttributes.add(color);
+		
+		KeyListAttribute cpuFilter = new KeyListAttribute();
+		cpuFilter.setAttributeCode("tablet_cpu");
+		cpuFilter.setValue(new ArrayList<String>());
+		cpuFilter.getValue().add(generateCpuFilter(properties.remove(55), properties.get(2)));
+		customAttributes.add(cpuFilter);
+		
+		KeyValueAttribute dimensions = new KeyValueAttribute();
+		dimensions.setAttributeCode("tablet_dimensions");
+		dimensions.setValue(properties.remove(47));
+		customAttributes.add(dimensions);
+		
+		KeyValueAttribute displayInfo = new KeyValueAttribute();
+		displayInfo.setAttributeCode("tablet_display_type");
+		displayInfo.setValue((properties.get(1) + " " + properties.get(9)).trim());
+		customAttributes.add(displayInfo);
+		
+		KeyListAttribute displayResolution = new KeyListAttribute();
+		displayResolution.setAttributeCode("tablet_display");
+		displayResolution.setValue(new ArrayList<String>());
+		displayResolution.getValue().add(generateDisplayResolution(properties.get(1), properties.remove(70)).trim());
+		customAttributes.add(displayResolution);
+		
+		KeyListAttribute displaySize = new KeyListAttribute();
+		displaySize.setAttributeCode("tablet_display_size_filt");
+		displaySize.setValue(new ArrayList<String>());
+		displaySize.getValue().add(generateDisplaySize(properties.remove(1)));
+		customAttributes.add(displaySize);
+		
+		KeyValueAttribute gpu = new KeyValueAttribute();
+		gpu.setAttributeCode("laptop_gpu");
+		gpu.setValue(properties.remove(10));
+		customAttributes.add(gpu);
+		
+		KeyValueAttribute hddInfo = new KeyValueAttribute();
+		hddInfo.setAttributeCode("laptop_hdd_info");
+		hddInfo.setValue(properties.get(11));
+		customAttributes.add(hddInfo);
+		
+		KeyValueAttribute hddSize = new KeyValueAttribute();
+		hddSize.setAttributeCode("laptop_hdd_size");
+		hddSize.setValue(generateHddSize(properties.get(11)));
+		customAttributes.add(hddSize);
+		
+		KeyValueAttribute optical = new KeyValueAttribute();
+		optical.setAttributeCode("laptop_optical");
+		optical.setValue(properties.remove(13));
+		customAttributes.add(optical);
+		
+		KeyListAttribute osFilter = new KeyListAttribute();
+		osFilter.setAttributeCode("laptop_os_filter");
+		osFilter.setValue(new ArrayList<String>());
+		osFilter.getValue().add(generateOsFilter(properties.remove(57)));
+		properties.remove(3);
+		customAttributes.add(osFilter);
+		
+		KeyValueAttribute processor = new KeyValueAttribute();
+		processor.setAttributeCode("laptop_processor");
+		processor.setValue(properties.remove(2));
+		customAttributes.add(processor);
+		
+		KeyListAttribute ram = new KeyListAttribute();
+		ram.setAttributeCode("laptop_ram");
+		ram.setValue(new ArrayList<String>());
+		ram.getValue().add(generateRamFilter(properties.remove(5)));
+		customAttributes.add(ram);
+		
+		KeyValueAttribute ramInfo = new KeyValueAttribute();
+		ramInfo.setAttributeCode("laptop_ram_info");
+		ramInfo.setValue(properties.remove(6));
+		customAttributes.add(ramInfo);
+		
+		KeyValueAttribute weight = new KeyValueAttribute();
+		weight.setAttributeCode("laptop_weight");
+		weight.setValue(properties.remove(48));
+		customAttributes.add(weight);
+		
+		KeyValueAttribute wifi = new KeyValueAttribute();
+		wifi.setAttributeCode("laptop_wifi");
+		wifi.setValue(properties.remove(15));
+		customAttributes.add(wifi);
+		
+		KeyValueAttribute warranty = new KeyValueAttribute();
+		warranty.setAttributeCode("laptop_warranty");
+		warranty.setValue(properties.remove(49));
+		customAttributes.add(warranty);
+		
+		KeyListAttribute yesNo = new KeyListAttribute();
+		yesNo.setAttributeCode("laptop_yes_no");
+		yesNo.setValue(generateYesNo(properties.remove(17),properties.remove(51),properties.remove(11), properties.remove(74), properties.remove(38),properties.remove(40),
+				properties.remove(59),properties.remove(28),properties.remove(62),properties.remove(52),properties.remove(22),properties.remove(9), properties.remove(69)));
+		customAttributes.add(yesNo);
+		
+		
+		KeyValueAttribute ports = new KeyValueAttribute();
+		ports.setAttributeCode("laptop_ports");
+		StringBuilder portsString = new StringBuilder();
+
+		KeyValueAttribute otherInfo = new KeyValueAttribute();
+		otherInfo.setAttributeCode("laptop_other_info");
+		StringBuilder otherInfoString = new StringBuilder();
+		List<Property> productProperties2 = new ArrayList<Property>();
+		productProperties2.addAll(list.values());
+		for(Property property : list.values()){
+			if(property.getPropertyId() == 18){
+				properties.remove(18);
+				portsString.append(property.getName() + ", ");
+				productProperties2.remove(property);
+				continue;
+			}
+			if(property.getPropertyId() == 29){
+				properties.remove(29);
+				portsString.append(property.getName() + ", ");
+				productProperties2.remove(property);
+				continue;
+			}
+			if(property.getPropertyId() == 41){
+				properties.remove(41);
+				portsString.append(property.getName() + ", ");
+				productProperties2.remove(property);
+				continue;
+			}
+			if(property.getPropertyId() == 42){
+				properties.remove(42);
+				portsString.append(property.getName() + ", ");
+				productProperties2.remove(property);
+				continue;
+			}
+			if(property.getPropertyId() == 53){
+				properties.remove(53);
+				portsString.append(property.getName() + ", ");
+				productProperties2.remove(property);
+				continue;
+			}
+			if(property.getPropertyId() == 61){
+				properties.remove(61);
+				portsString.append(property.getName() + ", ");
+				productProperties2.remove(property);
+				continue;
+			}
+			if(property.getPropertyId() == 62){
+				properties.remove(62);
+				portsString.append(property.getName() + ", ");
+				productProperties2.remove(property);
+				continue;
+			}
+			if(property.getPropertyId() == 24){
+				properties.remove(24);
+				portsString.append(property.getName() + ", ");
+				productProperties2.remove(property);
+				continue;
+			}
+			if(property.getPropertyId() == 28){
+				properties.remove(28);
+				portsString.append(property.getName() + ", ");
+				productProperties2.remove(property);
+				continue;
+			}
+			if(property.getPropertyId() == 29){
+				properties.remove(28);
+				portsString.append(property.getName() + ", ");
+				productProperties2.remove(property);
+				continue;
+			}
+		}
+		for(Property property : productProperties2){
+			if(properties.containsKey(property.getPropertyId())){
+				otherInfoString.append(property.getName() + ": " + property.getValue().get(0).getText());
+				if(properties.size() != 1){
+					otherInfoString.append("; ");
+				}
+			}
+		}
+		ports.setValue(portsString.toString());
+		customAttributes.add(ports);
+		otherInfo.setValue(otherInfoString.toString());
+		customAttributes.add(otherInfo);
+		
+		KeyValueAttribute shortDescription = new KeyValueAttribute();
+		shortDescription.setAttributeCode("short_description");
+		shortDescription.setValue(generateShortDescription(magentoAttributes.get(displaySize.getValue().get(0)), magentoAttributes.get(cpuFilter.getValue().get(0)), 
+				magentoAttributes.get(ram.getValue().get(0)), hddSize.getValue(), battery.getValue()));
+		customAttributes.add(shortDescription);
+		
+		return customAttributes;
 	}
 }

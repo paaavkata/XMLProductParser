@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.premiummobile.First.magento.Attribute;
-import com.premiummobile.First.magento.ExtensionAttribute;
+import com.premiummobile.First.magento.ExtensionAttributeRequest;
 import com.premiummobile.First.magento.KeyListAttribute;
 import com.premiummobile.First.magento.KeyValueAttribute;
 import com.premiummobile.First.magento.MagentoProductRequest;
@@ -54,7 +54,7 @@ public class MagentoMapper {
 	
 	public MagentoProductRequest mapSolytronProduct(SolytronProduct product, String[] params){
 		MagentoProductRequest magentoProduct = new MagentoProductRequest();
-		HashMap<Integer, String> properties = new HashMap<Integer, String>();
+		HashMap<Integer, Property> properties = new HashMap<Integer, Property>();
 		KeyValueAttribute productGroup = new KeyValueAttribute();
 		productGroup.setAttributeCode("product_group");
 		if(product.getProperties().size() > 0){
@@ -62,7 +62,7 @@ public class MagentoMapper {
 				productGroup.setValue(g.getProductGroupName() != null ? g.getProductGroupName() : "");
 				if(g.getList() != null){
 					for(Property property : g.getList()){
-						properties.put(property.getPropertyId(), property.getValue().get(0).getText());
+						properties.put(property.getPropertyId(), property);
 					}
 				}
 			}
@@ -86,18 +86,26 @@ public class MagentoMapper {
 				magentoProduct.setPrice(magentoProduct.getSpecialPrice() * 1.1);
 			}
 		}
-		if(params[1] == "6"){
-			magentoProduct.setName(trimName(product.getName(), 6));
+		else if(product.getPrice() != null){
+			if(product.getPrice().getCurrency().equals("BGN")){
+				magentoProduct.setPrice(Double.valueOf(product.getPrice().getText()) * 1.2 * 1.3);
+			}
+			else if(product.getPrice().getCurrency().equals("EUR")){
+				magentoProduct.setPrice(Integer.valueOf(product.getPrice().getText()) * 1.96 * 1.3);
+			}
+		}
+		if(params[1] == "3" || params[1] == "4" || params[1] == "5"){
+			magentoProduct.setName(trimName(product.getName(), 4));
 		}
 		else{
-			magentoProduct.setName(trimName(product.getName(), 4));
+			magentoProduct.setName(trimName(product.getName(), 6));
 		}
 		if(!magentoProduct.getName().toLowerCase().contains(product.getVendor().toLowerCase())){
 			magentoProduct.setName(product.getVendor() + " " + magentoProduct.getName());
 		}
 		String productName = magentoProduct.getName();
 		magentoProduct.setTypeId("simple");
-		magentoProduct.setWeight(Double.valueOf(properties.get(48) != null ? properties.get(48) : "1"));
+		magentoProduct.setWeight(Double.valueOf(properties.get(48) != null ? properties.get(48).getValue().get(0).getText() : "1"));
 		
 		MagentoStockItemRequest magentoStockItem = new MagentoStockItemRequest();
 		if(product.getStockInfoValue() != null){
@@ -118,29 +126,35 @@ public class MagentoMapper {
 			magentoStockItem.setStock(false);
 			magentoStockItem.setQty(0);
 		}
-		magentoProduct.setExtensionAttributes(new ExtensionAttribute());
+		magentoProduct.setExtensionAttributes(new ExtensionAttributeRequest());
 		magentoProduct.getExtensionAttributes().setItem(magentoStockItem);
-		List<Property> innerProperties = product.getProperties().get(1).getList();
 		switch(params[1]){
 			case "4":
-				if(innerProperties != null){
-					magentoProduct.setCustomAttributes(helper.generateLaptopAttributes(innerProperties));
+				if(properties.size() > 0){
+					magentoProduct.setCustomAttributes(helper.generateLaptopAttributes(properties));
 				}
 				magentoProduct.setAttributeSetId(10);
 				break;
 			
 			case "5":
-				if(innerProperties != null){
-					magentoProduct.setCustomAttributes(helper.generateTabletAttributes(innerProperties));
+				if(properties.size() > 0){
+					magentoProduct.setCustomAttributes(helper.generateTabletAttributes(properties));
 				}
 				magentoProduct.setAttributeSetId(11);
 				break;
 			
-			default:
-				if(innerProperties != null){
-					magentoProduct.setCustomAttributes(helper.generateSimpleAttributes(innerProperties));
+			case "6":
+				if(properties.size() > 0){
+					magentoProduct.setCustomAttributes(helper.generateTabletAttributes(properties));
 				}
 				magentoProduct.setAttributeSetId(12);
+				break;
+			
+			default:
+				if(properties.size() > 0){
+					magentoProduct.setCustomAttributes(helper.generateSimpleAttributes(properties));
+				}
+				magentoProduct.setAttributeSetId(4);
 				break;
 		}
 		if(magentoProduct.getCustomAttributes() == null){
@@ -150,7 +164,7 @@ public class MagentoMapper {
 		magentoProduct.getCustomAttributes().add(productGroup);
 		
 		KeyValueAttribute brand = new KeyValueAttribute();
-		brand.setAttributeCode("gsm_manufacturer");
+		brand.setAttributeCode("manufacturer");
 		if(product.getVendor() == null){
 			brand.setValue(helper.generateBrand(productName));
 		}
@@ -203,7 +217,7 @@ public class MagentoMapper {
 		
 		KeyListAttribute categories = new KeyListAttribute();
 		categories.setAttributeCode("category_ids");
-		categories.setValues(generateCategories(params, brand.getValue()));
+		categories.setValue(generateCategories(params, brand.getValue()));
 		magentoProduct.getCustomAttributes().add(categories);
 
 		return magentoProduct;
@@ -218,14 +232,17 @@ public class MagentoMapper {
 			if(params[1].equals("4")){
 				categories.add(magentoCategories.get("laptops" + brand.toLowerCase()));
 			}
-			if(params[1].equals("5")){
+			else if(params[1].equals("5")){
 				categories.add(magentoCategories.get("tablets" + brand.toLowerCase()));
 			}
-			if(params[1].equals("6")){
+			else if(params[1].equals("6")){
 				categories.add(magentoCategories.get("accessory"));
 				if(params.length >= 3){
 					categories.add(params[2]);
 				}
+			}
+			if(params.length >= 4){
+				categories.add(params[3]);
 			}
 		}
 		return categories;
@@ -252,6 +269,8 @@ public class MagentoMapper {
 		name = name.replace("Ultrabook", "");
 		name = name.replace("РАЗПРОДАЖБА!", "");
 		name = name.replace("PROMO!  ", "");
+		name = name.replace("&quot", "");
+		name = name.replace("\"", "");
 		name = name.trim();
 		int counter = 0;
 		for(int i = 0; i < name.length(); i++){

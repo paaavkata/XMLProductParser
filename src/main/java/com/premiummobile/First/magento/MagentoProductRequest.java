@@ -22,7 +22,7 @@ public class MagentoProductRequest implements MagentoProduct{
 	private String typeId;
 	private Double weight;
 	@JsonProperty("extension_attributes")
-	private ExtensionAttribute extensionAttributes;
+	private ExtensionAttributeRequest extensionAttributes;
 	@JsonProperty("product_links")
 	private List<ProductLink> productLinks;
 	private List<Option> options;
@@ -94,10 +94,10 @@ public class MagentoProductRequest implements MagentoProduct{
 	public void setWeight(Double weight) {
 		this.weight = weight;
 	}
-	public ExtensionAttribute getExtensionAttributes() {
+	public ExtensionAttributeRequest getExtensionAttributes() {
 		return extensionAttributes;
 	}
-	public void setExtensionAttributes(ExtensionAttribute extensionAttributes) {
+	public void setExtensionAttributes(ExtensionAttributeRequest extensionAttributes) {
 		this.extensionAttributes = extensionAttributes;
 	}
 	public List<ProductLink> getProductLinks() {

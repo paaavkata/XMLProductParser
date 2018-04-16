@@ -19,6 +19,11 @@ public class StockInfoProduct implements MagentoProduct{
 	public StockInfoProduct(){
 		
 	}
+	//VISIBILITY CONSTANTS
+	//1 - Not Visible
+	//2 - Only catalog
+	//3 - Only searchable
+	//4 - Both 2 & 3
 	public StockInfoProduct(String sku, double price, int status, int visibility, int qty, boolean inStock){
 		this.attribute = new ExtensionAttribute(qty, inStock);
 		this.sku = sku;

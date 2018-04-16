@@ -3,17 +3,20 @@ package com.premiummobile.First.util;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.TreeMap;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.imageio.ImageIO;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.http.StatusLine;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -39,12 +42,14 @@ import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import com.premiummobile.First.domain.StockInfoProduct;
 import com.premiummobile.First.magento.Attribute;
-import com.premiummobile.First.magento.ExtensionAttribute;
+import com.premiummobile.First.magento.ExtensionAttributeRequest;
 import com.premiummobile.First.magento.ItemResponse;
 import com.premiummobile.First.magento.MagentoAttribute;
 import com.premiummobile.First.magento.MagentoPostProduct;
 import com.premiummobile.First.magento.MagentoProduct;
 import com.premiummobile.First.magento.MagentoProductRequest;
+import com.premiummobile.First.magento.MagentoProductResponse;
+import com.premiummobile.First.magento.MagentoSiteMapXML;
 import com.premiummobile.First.magento.MediaGalleryContent;
 import com.premiummobile.First.magento.MediaGalleryEntry;
 import com.premiummobile.First.magento.MediaGalleryEntryWrapper;
@@ -80,7 +85,7 @@ public class RequestsExecutor {
 		this.solytronProperties = loader.getSolytron();
 		this.stantekProperties = loader.getStantek();
 		this.magentoProperties = loader.getMagento();
-		this.magentoAuthenticate();
+//		this.magentoAuthenticate();
 	}
 	
 	@Bean
@@ -123,8 +128,36 @@ public class RequestsExecutor {
 		CloseableHttpResponse response = this.getClient().execute(httpPost);
 		if (response.getEntity() != null) {
 			this.magentoToken = EntityUtils.toString(response.getEntity(), "UTF-8").replaceAll("\"", "");
-			System.out.println(this.magentoToken);
+			if(this.magentoToken.length() != 32){
+				this.magentoToken = null;
+				System.out.println("There was an error while authenticating to Magento2.");
+			}
+			else{
+				System.out.println(this.magentoToken + " <======== MAGENTO TOKEN");
+				Timer timer = new Timer();
+				timer.schedule(new TimerTask() {
+					@Override
+					public void run() {
+						magentoToken = null;
+					}
+				}, 4 * 60 * 60 * 1000);
+			}
         }
+	}
+	
+	private String magentoToken() throws Exception{
+		if(this.magentoToken != null){
+			return this.magentoToken;
+		}
+		else{
+			magentoAuthenticate();
+			if(this.magentoToken != null){
+				return this.magentoToken;
+			}
+			else{
+				throw new Exception("There was an error while trying to authenticate to magento!");
+			}
+		}
 	}
 	
 	private Serializer getSerializer(){
@@ -137,35 +170,34 @@ public class RequestsExecutor {
 		}
 	}
 
-	public String newMagentoProduct(MagentoProductRequest product) throws Exception{
-		if(magentoToken != null){
-			CloseableHttpClient client = this.getClient();
-			URIBuilder builder = new URIBuilder();
-			builder.setScheme("http").setHost(magentoProperties.get("host"));
-			builder.setPath(magentoProperties.get("product") + "/" + product.getSku());
-			HttpPut httpPut = new HttpPut(builder.build());
-			httpPut.addHeader("Authorization", "Bearer " + magentoToken);
-			httpPut.addHeader("Content-Type", "application/json");
-			MagentoPostProduct postProduct = new MagentoPostProduct();
-			postProduct.setMagentoProduct(generateInitialProduct(product));
-			StringEntity params = new StringEntity(om.writeValueAsString(postProduct), "UTF-8");
-			httpPut.setEntity(params);
-			CloseableHttpResponse response = client.execute(httpPut);
-			updateMagentoProduct(product);
-			response.close();
-			client.close();
-			return response.getStatusLine().getStatusCode() + " " + response.getStatusLine().getReasonPhrase();
+	public StatusLine newMagentoProduct(MagentoProductRequest product) throws Exception{
+		CloseableHttpClient client = this.getClient();
+		URIBuilder builder = new URIBuilder();
+		builder.setScheme("http").setHost(magentoProperties.get("host"));
+		builder.setPath(magentoProperties.get("product") + "/" + product.getSku());
+		HttpPut httpPut = new HttpPut(builder.build());
+		httpPut.addHeader("Authorization", "Bearer " + magentoToken());
+		httpPut.addHeader("Content-Type", "application/json");
+		MagentoPostProduct postProduct = new MagentoPostProduct();
+		postProduct.setMagentoProduct(generateInitialProduct(product));
+		StringEntity params = new StringEntity(om.writeValueAsString(postProduct), "UTF-8");
+		httpPut.setEntity(params);
+		CloseableHttpResponse response = client.execute(httpPut);
+		StatusLine statusLine;
+		if(response.getStatusLine().getStatusCode() == 200){
+			statusLine = updateMagentoProduct(product);
+			return statusLine;
 		}
 		else{
-			magentoAuthenticate();
-			return newMagentoProduct(product);
+			System.out.println(om.writeValueAsString(postProduct));
+			System.out.println("Product upload error: " + EntityUtils.toString(response.getEntity(), "UTF-8"));
 		}
-		
-		
-		
+		response.close();
+		client.close();
+		return response.getStatusLine();
 	}
 	
-	public String updateMagentoProduct(MagentoProduct product) throws Exception{
+	public StatusLine updateMagentoProduct(MagentoProduct product) throws Exception{
 		CloseableHttpClient client = this.getClient();
 		MagentoPostProduct postProduct = new MagentoPostProduct();
 		postProduct.setMagentoProduct(product);
@@ -177,7 +209,7 @@ public class RequestsExecutor {
 		builder.setScheme("http").setHost(magentoProperties.get("host"));
 		builder.setPath(magentoProperties.get("product"));
 		HttpPost httpPost = new HttpPost(builder.build());
-		httpPost.addHeader("Authorization", "Bearer " + magentoToken);
+		httpPost.addHeader("Authorization", "Bearer " + magentoToken());
 		httpPost.addHeader("Content-Type", "application/json");
 		httpPost.setEntity(params);
 		CloseableHttpResponse response = client.execute(httpPost);
@@ -185,7 +217,7 @@ public class RequestsExecutor {
 		System.err.println("Product status: " + response.getStatusLine().getStatusCode());
 		response.close();
 		client.close();
-		return response.getStatusLine().getStatusCode() + " " + response.getStatusLine().getReasonPhrase();
+		return response.getStatusLine();
 	}
 	
 	private MagentoProductRequest generateInitialProduct(MagentoProductRequest product) {
@@ -193,11 +225,12 @@ public class RequestsExecutor {
 		initial.setName(product.getName());
 		initial.setSku(product.getSku());
 		initial.setPrice(product.getPrice());
+		initial.setAttributeSetId(product.getAttributeSetId());
 		initial.setStatus(1);
 		initial.setVisibility(4);
 		initial.setOptions(new ArrayList<Option>());
 		initial.setTypeId("simple");
-		initial.setExtensionAttributes(new ExtensionAttribute());
+		initial.setExtensionAttributes(new ExtensionAttributeRequest());
 		initial.setProductLinks(new ArrayList<ProductLink>());
 //		initial.setMediaGalleryEntries(new ArrayList<MediaGalleryEntry>());
 		initial.setTierPrices(new ArrayList<TierPrice>());
@@ -243,13 +276,13 @@ public class RequestsExecutor {
 	}
 	
 
-	public List<String> downloadMagentoAttributes() throws Exception {
+	public List<MagentoAttribute> downloadMagentoAttributes() throws Exception {
 		URIBuilder builder = new URIBuilder();
 		builder.setScheme("http").setHost(magentoProperties.get("host"));
 		builder.setPath(magentoProperties.get("attributes"));
 		builder.setParameter("searchCriteria", "0");
 		HttpGet httpGet = new HttpGet(builder.build());
-		httpGet.addHeader("Authorization", "Bearer " + magentoToken);
+		httpGet.addHeader("Authorization", "Bearer " + magentoToken());
 		httpGet.addHeader("Content-Type", "application/json");
 		CloseableHttpResponse response = this.getClient().execute(httpGet);
 		ItemResponse itemResponse = new ItemResponse();
@@ -261,10 +294,10 @@ public class RequestsExecutor {
 			for(MagentoAttribute attribute : itemResponse.getAttributes()){
 				attributes.put(attribute.getId(), attribute.getName());
 				if(attribute.getOptions().size() > 0){
-					System.out.println(attribute.getName());
+//					System.out.println(attribute.getName());
 					for(Option option : attribute.getOptions()){
 						options.put(option.getValue(), option.getLabel());
-						System.out.println(option.getValue() + "=" + option.getLabel());
+//						System.out.println(option.getValue() + "=" + option.getLabel());
 					}
 				}
 			}
@@ -275,8 +308,7 @@ public class RequestsExecutor {
 //				System.out.println(entry.getKey() + "=" + entry.getValue());
 //			}
         }
-		
-		return null;
+		return itemResponse.getAttributes();
 	}
 	
 	public String uploadMagentoImage(MagentoProductRequest product, String imageUrl, int counter) throws Exception{
@@ -333,7 +365,7 @@ public class RequestsExecutor {
 		builder.setPath(magentoProperties.get("product") + "/" + product.getSku() + "/media");
 		
 		HttpPost httpPost = new HttpPost(builder.build());
-		httpPost.addHeader("Authorization", "Bearer " + magentoToken);
+		httpPost.addHeader("Authorization", "Bearer " + magentoToken());
 		httpPost.addHeader("Content-Type", "application/json");
 		httpPost.setEntity(params);
 		
@@ -351,7 +383,7 @@ public class RequestsExecutor {
 		builder.setScheme("http").setHost(magentoProperties.get("host"));
 		builder.setPath(magentoProperties.get("categories"));
 		HttpGet httpGet = new HttpGet(builder.build());
-		httpGet.addHeader("Authorization", "Bearer " + magentoToken);
+		httpGet.addHeader("Authorization", "Bearer " + magentoToken());
 		httpGet.addHeader("Content-Type", "application/json");
 		CloseableHttpResponse response = this.getClient().execute(httpGet);
 		Category category = new Category();
@@ -417,5 +449,32 @@ public class RequestsExecutor {
 			}
 		}
 		return priceList;
+	}
+
+	public MagentoProductResponse getMagentoProduct(String sku) throws Exception {
+		CloseableHttpClient client = this.getClient();
+		URIBuilder builder = new URIBuilder();
+		builder.setScheme("https").setHost(magentoProperties.get("host"));
+		builder.setPath(magentoProperties.get("product") + "/" + sku);
+		HttpGet httpGet = new HttpGet(builder.build());
+		httpGet.addHeader("Authorization", "Bearer " + magentoToken());
+		CloseableHttpResponse response = client.execute(httpGet);
+		MagentoProductResponse product;
+		if(response.getStatusLine().getStatusCode() == 200){
+			product = om.readValue(EntityUtils.toString(response.getEntity(), "UTF-8"), MagentoProductResponse.class);
+			return product;
+		}
+		response.close();
+		client.close();
+		return null;
+	}
+	
+	public MagentoSiteMapXML getMagentoSitemap() throws Exception{
+		URIBuilder builder = new URIBuilder();
+		builder.setScheme("https").setHost(magentoProperties.get("host") + "/" + magentoProperties.get("siteMapUri"));
+		HttpGet httpGet = new HttpGet(builder.build());
+		CloseableHttpResponse response = getClient().execute(httpGet);
+		MagentoSiteMapXML siteMap = getSerializer().read(MagentoSiteMapXML.class, response.getEntity().getContent());
+		return siteMap;
 	}
 }
