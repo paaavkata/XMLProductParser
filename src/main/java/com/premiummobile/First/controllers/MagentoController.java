@@ -3,6 +3,7 @@ package com.premiummobile.First.controllers;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -16,20 +17,32 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.premiummobile.First.domain.StockInfoProduct;
+import com.premiummobile.First.magento.Attribute;
+import com.premiummobile.First.magento.KeyValueAttribute;
+import com.premiummobile.First.magento.MagentoAttribute;
 import com.premiummobile.First.magento.MagentoPriceUpdater;
+import com.premiummobile.First.magento.MagentoProductResponse;
 import com.premiummobile.First.magento.MagentoSiteMapUrlXML;
 import com.premiummobile.First.magento.MagentoSiteMapXML;
+import com.premiummobile.First.solytron.MainDownloader;
 import com.premiummobile.First.util.PropertiesLoader;
 import com.premiummobile.First.util.RequestsExecutor;
 
 @Controller
 public class MagentoController {
-
+	
+	@Autowired
+	private MainDownloader downloader;
+	
 	@Autowired
 	private MagentoPriceUpdater updater;
 	
 	@Autowired
 	private RequestsExecutor executor;
+	
+	@Autowired
+	private PropertiesLoader loader;
 	
 	@PostMapping("/magentoprices")
 	@ResponseBody
@@ -85,4 +98,51 @@ public class MagentoController {
 		responses.add(status200);
 		return responses;
 	}
+	
+	
+	@GetMapping("/readMagentoAttributes")
+	@ResponseBody
+	public List<MagentoAttribute> readAttributes() throws Exception{
+		List<MagentoAttribute> response = downloader.downloadMagentoAttributes();
+		
+		return response;
+	}
+	
+	@GetMapping("/readMagentoCategories")
+	@ResponseBody
+	public List<String> readCategories() throws Exception{
+		List<String> response = downloader.downloadMagentoCategories();
+		
+		return response;
+	}
+	
+	@GetMapping("/regenerateUrls")
+	@ResponseBody
+	public List<String> regenerateUrls() throws Exception{
+		List<String> response = new ArrayList<>();
+		HashMap<String, StockInfoProduct> products = loader.loadStockInfoProducts();
+		for(Entry<String, StockInfoProduct> entry : products.entrySet()) {
+			MagentoProductResponse magentoProduct = executor.getMagentoProduct(entry.getKey());
+			Attribute keyValueAttr = null;
+			for(Attribute attribute : magentoProduct.getCustomAttributes()) {
+				if("url_key".equals(attribute.getAttributeCode())){
+					keyValueAttr = attribute;
+				}
+			}
+			if(entry.getValue().getPrice() > 150) {
+//				keyValueAttr.setValue(magentoProduct.getName().replaceAll(" ", "-") + "-cena-na-izplashtane-" + magentoProduct.getSku());
+			}
+			else {
+				keyValueAttr.setValue(magentoProduct.getName().replaceAll(" ", "-") + magentoProduct.getSku());
+				magentoProduct.setExtensionAttributes(null);
+				magentoProduct.setMediaGalleryEntries(null);
+				List<Attribute> attributes = new ArrayList<Attribute>();
+				attributes.add(keyValueAttr);
+				magentoProduct.setCustomAttributes(attributes);
+				response.add(executor.updateMagentoProduct(magentoProduct).toString());
+			}
+		}
+		return response;
+	}
+
 }

@@ -1,17 +1,12 @@
 package com.premiummobile.First.controllers;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.premiummobile.First.magento.MagentoAttribute;
-import com.premiummobile.First.magento.MagentoProductRequest;
 import com.premiummobile.First.solytron.MainDownloader;
-import com.premiummobile.First.solytron.Model.SolytronProduct;
 
 @Controller
 public class SolytronController {
@@ -36,22 +31,6 @@ public class SolytronController {
 		else{
 			return "Success! There are " + response + " products in selected category.";
 		}
-	}
-	
-	@GetMapping("/readMagentoAttributes")
-	@ResponseBody
-	public List<MagentoAttribute> readAttributes() throws Exception{
-		List<MagentoAttribute> response = downloader.downloadMagentoAttributes();
-		
-		return response;
-	}
-	
-	@GetMapping("/readMagentoCategories")
-	@ResponseBody
-	public List<String> readCategories() throws Exception{
-		List<String> response = downloader.downloadMagentoCategories();
-		
-		return response;
 	}
 	
 //	@RequestMapping(value = "/welcome/{userId}/{userName}/", method = RequestMethod.GET)

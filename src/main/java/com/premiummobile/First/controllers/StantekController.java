@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.premiummobile.First.stantek.StantekMainDownloader;
 import com.premiummobile.First.stantek.StantekXMLReader;
-import com.premiummobile.First.util.RequestsExecutor;
 
 @Controller
 public class StantekController {

@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class KeyListAttribute extends Attribute{
+public class KeyListAttribute implements Attribute{
 	
 	@JsonProperty("attribute_code")
 	private String attributeCode;

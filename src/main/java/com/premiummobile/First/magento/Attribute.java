@@ -1,9 +1,12 @@
 package com.premiummobile.First.magento;
 
-public abstract class Attribute {
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-	abstract String getAttributeCode();
-	abstract void setAttributeCode(String code);
-	abstract Object getValue();
-	abstract void setValue(Object value);
+@JsonDeserialize(using = AttributeDeserializer.class)
+public interface Attribute {
+
+	public String getAttributeCode();
+	public void setAttributeCode(String code);
+	public Object getValue();
+	public void setValue(Object value);
 }

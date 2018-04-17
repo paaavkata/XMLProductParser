@@ -15,7 +15,6 @@ import java.util.Map.Entry;
 import java.util.Properties;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.core.JsonParseException;
@@ -43,52 +42,42 @@ public class PropertiesLoader {
 	@Autowired
 	ObjectMapper om;
 	
-	@Bean
 	public HashMap<String, String> getSolytronLaptop(){
 		return load(solytronLaptop);
 	}
 	
-	@Bean
 	public HashMap<String, String> getBrands(){
 		return load(brands);
 	}
 	
-	@Bean
 	public HashMap<String, String> getColors(){
 		return load(colors);
 	}
 	
-	@Bean
 	public HashMap<String, String> getSolytronCategories(){
 		return load(solytronCategories);
 	}
 	
-	@Bean
 	public HashMap<String, String> getSolytronTablet(){
 		return load(solytronTablet);
 	}
 	
-	@Bean
 	public HashMap<String, String> getSolytron(){
 		return load(solytron);
 	}
 	
-	@Bean
 	public HashMap<String, String> getStantek(){
 		return load(stantek);
 	}
 	
-	@Bean
 	public HashMap<String, String> getMagento(){
 		return load(magentoAttributes);
 	}
 	
-	@Bean
 	public HashMap<String, String> getMagentoAttributes(){
 		return load(magentoAttributesValues);
 	}
 	
-	@Bean
 	public HashMap<String, String> getMagentoCategories(){
 		return load(magentoCategories);
 	}

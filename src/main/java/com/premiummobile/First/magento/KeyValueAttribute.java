@@ -3,7 +3,7 @@ package com.premiummobile.First.magento;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class KeyValueAttribute extends Attribute{
+public class KeyValueAttribute implements Attribute{
 
 	@JsonProperty("attribute_code")
 	private String attributeCode;
